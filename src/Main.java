@@ -49,7 +49,13 @@ public class Main {
         taskManager.getSubtaskById(subtask1.getId());
         taskManager.getSubtaskById(subtask1.getId());
         taskManager.updateSubtask(subtaskForUpdate);
+
         printAllTasks((InMemoryTaskManager) taskManager);
+
+        taskManager.removeEpics();
+
+        printAllTasks((InMemoryTaskManager) taskManager);
+
 
     }
 
