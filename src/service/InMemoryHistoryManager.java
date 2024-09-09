@@ -3,37 +3,88 @@ package service;
 import model.Task;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    private List<Task> historyList = new ArrayList<>();
-    private Set<Task> historySet = new HashSet<>();
 
-    @Override
-    public void add(Task task) {
-        historySet.addAll(historyList);
-        boolean isPresent = historySet.add(task);
-        if (!isPresent) {
-            historyList.remove(task);
-            historyList.add(task);
-        } else {
-            historyList.add(task);
+    HashMap<Integer, Node<Task>> historyHashMap = new HashMap<>();
+    myLinkedList<Task> historyList = new myLinkedList<>();
+    ArrayList<Task> list = new ArrayList<>();
+
+    public static class myLinkedList<T> {
+        public Node<T> head;
+        public Node<T> tail;
+        private int size = 0;
+
+        public void linkLast(T obj) {
+            final Node<T> oldTail = tail;
+            final Node<T> newNode = new Node<>(oldTail, obj, null);
+            tail = newNode;
+            if (oldTail == null) {
+                head = newNode;
+            } else {
+                oldTail.next = newNode;
+                size++;
+            }
+        }
+    }
+
+    public void removeNode(Node<Task> node) {
+        if (node != null) {
+            if (node.prev == null) {
+                if (node.next == null) {
+                }
+                else {
+                    historyList.head = node.next;
+                }
+            } else {
+                if (node.next != null) {
+                    node.prev.next = node.next.prev;
+                }
+            }
+
+            if (node.next == null) {
+                if (node.prev == null) {
+                } else {
+                    historyList.tail = node.prev;
+                }
+            } else {
+                if (node.prev != null) {
+                    node.next.prev = node.prev.next;
+                }
+            }
+
+            node.data = null;
+            historyList.size--;
         }
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return new ArrayList<>(historyList);
+    public void add(Task task) {
+        int taskId = task.getId();
+
+        if (historyHashMap.containsKey(taskId)) {
+            Node NodeForRemove = historyHashMap.get(taskId);
+            removeNode(NodeForRemove);
+            historyHashMap.remove(taskId);
+        }
+        historyList.linkLast(task);
+        historyHashMap.put(taskId, historyList.tail);
     }
 
     @Override
-    public void remove(Task task) {
-        historyList.remove(task);
+    public List<Task> getHistory() {
+        for (Node<Task> node : historyHashMap.values()) {
+            list.add(node.data);
+        }
+        return list;
+    }
+
+    @Override
+    public void remove(int id) {
+        Node NodeForRemove = historyHashMap.get(id);
+        removeNode(NodeForRemove);
+        historyHashMap.remove(id);
     }
 }
-//Текущий комит:
-//Сделать историю посещений неограниченной по размеру.
-//Избавиться от повторных просмотров в истории.
-//Добавить метод removeId для удаления из истории просмотров при удалении задач.
