@@ -1,8 +1,8 @@
 package service;
 
-import model.Task;
-import model.Subtask;
 import model.Epic;
+import model.Subtask;
+import model.Task;
 import model.TaskStatus;
 
 import java.util.ArrayList;
@@ -179,6 +179,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(id)) {
             Task task = tasks.get(id);
             tasks.remove(id);
+            historyManager.remove(task);
             return task;
         } else {
             System.out.println("Задачи с данным id не существует");
@@ -194,6 +195,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epicOfSubtask = epics.get(epicId);
 
             subtasks.remove(id);
+            historyManager.remove(subtask);
             epicOfSubtask.removeSubtaskIdById(id);
             updateEpicStatus(epicOfSubtask);
             return subtask;
@@ -211,8 +213,10 @@ public class InMemoryTaskManager implements TaskManager {
 
             for (int i : idsForRemove) {
                 subtasks.remove(i);
+                historyManager.remove(subtasks.get(i));
             }
             epics.remove(id);
+            historyManager.remove(epic);
             return epic;
         } else {
             System.out.println("Эпика с данным id не существует");
@@ -222,17 +226,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTasks() {
+        for(Task task : tasks.values()) {
+            historyManager.remove(task);
+        }
         tasks.clear();
     }
 
     @Override
     public void removeEpics() {
+        for (Epic epic : epics.values()) {
+            historyManager.remove(epic);
+        }
+        for (Subtask subtask : subtasks.values()) {
+            historyManager.remove(subtask);
+        }
         epics.clear();
         subtasks.clear();
     }
 
     @Override
     public void removeSubtasks() {
+        for (Subtask subtask : subtasks.values()) {
+            historyManager.remove(subtask);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.setTaskStatus(TaskStatus.NEW);
@@ -242,7 +258,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public ArrayList<Task> getHistory() {
-        return (ArrayList<Task>) historyManager.getHistory();
+        return historyManager.getHistory();
     }
 
     private void updateEpicStatus(Epic epic) {
