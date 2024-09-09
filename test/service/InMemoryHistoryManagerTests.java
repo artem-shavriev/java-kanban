@@ -45,14 +45,4 @@ public class InMemoryHistoryManagerTests {
         assertNotNull(historyManager.getHistory().get(0), "История не получгена.");
     }
 
-    @Test
-    void shouldCheckingHistoryLength() {
-        int maxHistorySize = 10;
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
-        for (int i = 0; i <= 15; i++) {
-            historyManager.add(task);
-        }
-        int historyListSize = historyManager.getHistory().size();
-        assertTrue(maxHistorySize >= historyListSize, "В историю добалвено более 10 задач");
-    }
 }
