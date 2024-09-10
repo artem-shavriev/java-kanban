@@ -35,8 +35,7 @@ public class InMemoryHistoryManager implements HistoryManager {
             if (node.prev == null) {
                 if (node.next == null) {
                     System.out.println("Узел удален");
-                }
-                else {
+                } else {
                     historyList.head = node.next;
                 }
             } else {
@@ -85,8 +84,8 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void remove(int id) {
-        Node NodeForRemove = historyHashMap.get(id);
-        removeNode(NodeForRemove);
+        Node nodeForRemove = historyHashMap.get(id);
+        removeNode(nodeForRemove);
         historyHashMap.remove(id);
     }
 }
