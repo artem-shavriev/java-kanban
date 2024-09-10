@@ -227,7 +227,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTasks() {
-        for(int id : tasks.keySet()) {
+        for (int id : tasks.keySet()) {
             historyManager.remove(id);
         }
         tasks.clear();
