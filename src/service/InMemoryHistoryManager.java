@@ -9,10 +9,10 @@ import java.util.List;
 public class InMemoryHistoryManager implements HistoryManager {
 
     HashMap<Integer, Node<Task>> historyHashMap = new HashMap<>();
-    myLinkedList<Task> historyList = new myLinkedList<>();
+    MyLinkedList<Task> historyList = new MyLinkedList<>();
     ArrayList<Task> list = new ArrayList<>();
 
-    public static class myLinkedList<T> {
+    public static class MyLinkedList<T> {
         public Node<T> head;
         public Node<T> tail;
         private int size = 0;
@@ -34,6 +34,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         if (node != null) {
             if (node.prev == null) {
                 if (node.next == null) {
+                    System.out.println("Узел удален");
                 }
                 else {
                     historyList.head = node.next;
@@ -46,6 +47,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
             if (node.next == null) {
                 if (node.prev == null) {
+                    System.out.println("Узел удален");
                 } else {
                     historyList.tail = node.prev;
                 }
@@ -65,8 +67,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         int taskId = task.getId();
 
         if (historyHashMap.containsKey(taskId)) {
-            Node NodeForRemove = historyHashMap.get(taskId);
-            removeNode(NodeForRemove);
+            Node nodeForRemove = historyHashMap.get(taskId);
+            removeNode(nodeForRemove);
             historyHashMap.remove(taskId);
         }
         historyList.linkLast(task);
