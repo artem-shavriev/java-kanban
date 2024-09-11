@@ -10,7 +10,6 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     HashMap<Integer, Node<Task>> historyHashMap = new HashMap<>();
     MyLinkedList<Task> historyList = new MyLinkedList<>();
-    ArrayList<Task> list = new ArrayList<>();
 
     public static class MyLinkedList<T> {
         public Node<T> head;
@@ -76,6 +75,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public List<Task> getHistory() {
+        ArrayList<Task> list = new ArrayList<>();
         for (Node<Task> node : historyHashMap.values()) {
             list.add(node.data);
         }

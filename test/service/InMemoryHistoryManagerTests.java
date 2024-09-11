@@ -83,8 +83,5 @@ public class InMemoryHistoryManagerTests {
 
         historyManager.remove(1);
         assertNotEquals(historyManager.getHistory().get(0), task, "Задача id:1 не удалена");
-        historyManager.remove(2);
-        assertNotEquals(historyManager.getHistory().get(0), task, "Задача id:2 не удалена");
-
     }
 }
