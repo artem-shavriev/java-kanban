@@ -39,7 +39,7 @@ public class InMemoryHistoryManager implements HistoryManager {
                 }
             } else {
                 if (node.next != null) {
-                    node.prev.next = node.next.prev;
+                    node.prev.next = node.next;
                 }
             }
 
@@ -51,7 +51,7 @@ public class InMemoryHistoryManager implements HistoryManager {
                 }
             } else {
                 if (node.prev != null) {
-                    node.next.prev = node.prev.next;
+                    node.next.prev = node.prev;
                 }
             }
 
