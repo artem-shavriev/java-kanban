@@ -3,15 +3,20 @@ package service;
 import model.Epic;
 import model.Subtask;
 import model.Task;
-
-import java.util.ArrayList;
 import model.TaskStatus;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import static org.junit.jupiter.api.Assertions.*;
 
-class InMemoryTaskManagerTests {
+import java.util.ArrayList;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class InMemoryTaskManagerTest {
 
     private static TaskManager manager;
 
@@ -399,7 +404,33 @@ class InMemoryTaskManagerTests {
 
     }
 
-    //Невозможный тест №1
-    //Проверьте, что объект Epic нельзя добавить в самого себя в виде подзадачи
-    //Подзадача добавляется к эпику во время создания подзадачи, метод принимает только подзадачи. Поэтому тест невозможен.
+    @Test
+    void ShouldNotBeIrrelevantSubtaskIdsInEpic() {
+        Epic epic = new Epic(1,"Поехать в отпуск", "Организовать путешествие");
+        manager.addEpic(epic);
+
+        Subtask subtask1 = new Subtask(2, 1,"Купить шпатель",
+                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        manager.addSubtask(subtask1);
+
+        Subtask subtask2 = new Subtask(3, 1,"Купить краску",
+                "Выбрать краску и купить", TaskStatus.DONE);
+        manager.addSubtask(subtask2);
+
+        Subtask subtask3 = new Subtask(4, 1,"Выбрать курорт",
+                "Изучить варинты гостиниц и забронировать", TaskStatus.IN_PROGRESS);
+        manager.addSubtask(subtask3);
+
+        ArrayList<Integer> subtasksIds = manager.getEpicById(1).getSubtasksIds();
+
+        manager.removeSubtaskById(3);
+        assertFalse(subtasksIds.contains(3), "Id подзадачи не удалился");
+
+        assertTrue(subtasksIds.contains(2), "Id подзадачи удалился или не был добавлен.");
+        assertTrue(subtasksIds.contains(4), "Id подзадачи удалился или не был добавлен.");
+
+        manager.removeSubtasks();
+        assertFalse(subtasksIds.contains(2), "Id подзадач не удалились");
+        assertFalse(subtasksIds.contains(4), "Id подзадач не удалились");
+    }
 }

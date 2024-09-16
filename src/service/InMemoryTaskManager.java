@@ -1,11 +1,12 @@
 package service;
 
-import model.Task;
-import model.Subtask;
 import model.Epic;
+import model.Subtask;
+import model.Task;
 import model.TaskStatus;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
@@ -179,6 +180,7 @@ public class InMemoryTaskManager implements TaskManager {
         if (tasks.containsKey(id)) {
             Task task = tasks.get(id);
             tasks.remove(id);
+            historyManager.remove(id);
             return task;
         } else {
             System.out.println("Задачи с данным id не существует");
@@ -194,6 +196,7 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epicOfSubtask = epics.get(epicId);
 
             subtasks.remove(id);
+            historyManager.remove(id);
             epicOfSubtask.removeSubtaskIdById(id);
             updateEpicStatus(epicOfSubtask);
             return subtask;
@@ -211,8 +214,10 @@ public class InMemoryTaskManager implements TaskManager {
 
             for (int i : idsForRemove) {
                 subtasks.remove(i);
+                historyManager.remove(i);
             }
             epics.remove(id);
+            historyManager.remove(id);
             return epic;
         } else {
             System.out.println("Эпика с данным id не существует");
@@ -222,17 +227,29 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void removeTasks() {
+        for (int id : tasks.keySet()) {
+            historyManager.remove(id);
+        }
         tasks.clear();
     }
 
     @Override
     public void removeEpics() {
+        for (int id : epics.keySet()) {
+            historyManager.remove(id);
+        }
+        for (int id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         epics.clear();
         subtasks.clear();
     }
 
     @Override
     public void removeSubtasks() {
+        for (int id : subtasks.keySet()) {
+            historyManager.remove(id);
+        }
         subtasks.clear();
         for (Epic epic : epics.values()) {
             epic.setTaskStatus(TaskStatus.NEW);
@@ -241,8 +258,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public ArrayList<Task> getHistory() {
-        return (ArrayList<Task>) historyManager.getHistory();
+    public  List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
     private void updateEpicStatus(Epic epic) {
