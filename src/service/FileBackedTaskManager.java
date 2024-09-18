@@ -3,6 +3,7 @@ package service;
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import model.TaskType;
 
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,11 +19,30 @@ import java.nio.file.Paths;
 public class FileBackedTaskManager extends InMemoryTaskManager {
     Path  backedFile;
 
+    public FileBackedTaskManager() {
+    }
+
     public FileBackedTaskManager(Path backedFile) {
         this.backedFile = backedFile;
     }
 
     public void save() {
+    }
+
+    String toString(Task task) {
+        String taskToString;
+        if (task.getTaskType().equals(TaskType.SUBTASK)) {
+            Subtask subtask = (Subtask) task;
+            taskToString = task.getId() + "," + task.getTaskType() + ","
+                    + task.getNameOfTask() + "," + task.getTaskStatus() + ","
+                    + task.getDescription() + "," + subtask.getEpicId();
+        } else {
+            taskToString = task.getId() + "," + task.getTaskType() + ","
+                    + task.getNameOfTask() + "," + task.getTaskStatus() + ","
+                    + task.getDescription();
+        }
+
+        return taskToString;
     }
 
     @Override

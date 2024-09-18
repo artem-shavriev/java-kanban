@@ -7,6 +7,7 @@ public class Task {
     private String description;
     private Integer id;
     private TaskStatus taskStatus;
+    private TaskType taskType = TaskType.TASK;
 
     //конструктор с id для целей тестирования
     public Task(int id, String nameOfTask, String description, TaskStatus taskStatus) {
@@ -32,6 +33,10 @@ public class Task {
         this.nameOfTask = nameOfTask;
         this.description = description;
 
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
     }
 
     public String getNameOfTask() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtasksIds = new ArrayList<>();
+    private TaskType taskType = TaskType.EPIC;
 
     //конструктор с id для целей тестирования
     public Epic(int id, String nameOfTask, String description) {
@@ -12,6 +13,10 @@ public class Epic extends Task {
 
     public Epic(String nameOfTask, String description) {
         super(nameOfTask, description);
+    }
+
+    public TaskType getTaskType() {
+        return taskType;
     }
 
     public void setSubtaskId(int id) {

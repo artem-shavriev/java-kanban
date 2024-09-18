@@ -2,6 +2,7 @@ package model;
 
 public class Subtask extends Task {
     private Integer epicId;
+    private TaskType taskType = TaskType.SUBTASK;
 
     //конструктор с id для целей тестирования
     public Subtask(int id, int epicId, String nameOfTask, String description, TaskStatus taskStatus) {
@@ -13,6 +14,10 @@ public class Subtask extends Task {
         super(nameOfTask, description, taskStatus);
     }
 
+    @Override
+    public TaskType getTaskType() {
+        return taskType;
+    }
 
     public int getEpicId() {
         return epicId;

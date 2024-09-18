@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class InMemoryTaskManagerTest {
+class InMemoryTaskManagerTests {
 
     private static TaskManager manager;
 
