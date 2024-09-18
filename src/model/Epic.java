@@ -7,6 +7,11 @@ public class Epic extends Task {
     private TaskType taskType = TaskType.EPIC;
 
     //конструктор с id для целей тестирования
+    public Epic(int id, TaskType taskType, String nameOfTask, TaskStatus taskStatus, String description) {
+        super(id, nameOfTask, description, taskStatus);
+        this.taskType = taskType;
+    }
+
     public Epic(int id, String nameOfTask, String description) {
         super(id, nameOfTask, description);
     }

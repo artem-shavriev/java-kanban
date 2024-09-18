@@ -3,6 +3,7 @@ package service;
 import model.Epic;
 import model.Subtask;
 import model.Task;
+import model.TaskStatus;
 import model.TaskType;
 
 import java.io.FileWriter;
@@ -43,6 +44,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         }
 
         return taskToString;
+    }
+
+    Task taskFromString(String value) {
+        String[] array = value.split(",");
+        int id = Integer.valueOf(array[0]);
+        TaskType type = TaskType.valueOf(array[1]);
+        String name = array[2];
+        TaskStatus status = TaskStatus.valueOf(array[3]);
+        String description = array[4];
+
+        if (type.equals(TaskType.SUBTASK)) {
+            int epicId = Integer.valueOf(array[5]);
+            return  new Subtask (id, type, name, status, description, epicId);
+        } else if (type.equals(TaskType.TASK)){
+             return  new Task (id, type, name, status, description);
+        } else {
+            return new Epic (id, type, name, status, description);
+        }
     }
 
     @Override

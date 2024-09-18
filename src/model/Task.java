@@ -23,6 +23,14 @@ public class Task {
         this.nameOfTask = nameOfTask;
     }
 
+    public Task(int id, TaskType taskType, String nameOfTask, TaskStatus taskStatus, String description) {
+        this.id = id;
+        this.taskType = taskType;
+        this.nameOfTask = nameOfTask;
+        this.taskStatus = taskStatus;
+        this.description = description;
+    }
+
     public Task(String nameOfTask, String description, TaskStatus taskStatus) {
         this.nameOfTask = nameOfTask;
         this.description = description;
