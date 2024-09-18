@@ -42,6 +42,7 @@ public class InMemoryHistoryManagerTests {
     void shouldGetHistory() {
         Task task = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
         historyManager.add(task);
+
         assertNotNull(historyManager.getHistory().get(0), "История не получена.");
     }
 

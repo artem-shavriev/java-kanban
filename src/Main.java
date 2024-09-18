@@ -31,8 +31,8 @@ public class Main {
         taskManager.addSubtask(subtask1);
         taskManager.addSubtask(subtask2);
         taskManager.addSubtask(subtask3);
+
         taskManager.getTaskById(task1.getId());
-        taskManager.removeTaskById(task1.getId());
         taskManager.getEpicById(epic1.getId());
         taskManager.getEpicById(epic1.getId());
         taskManager.getEpicById(epic1.getId());
@@ -41,7 +41,6 @@ public class Main {
         taskManager.getSubtaskById(subtask1.getId());
         taskManager.updateSubtask(subtaskForUpdate);
         printAllTasks((InMemoryTaskManager) taskManager);
-        taskManager.removeEpics();
         printAllTasks((InMemoryTaskManager) taskManager);
     }
 
