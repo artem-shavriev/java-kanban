@@ -1,7 +1,12 @@
 package service;
 
-public class ManagerSaveException extends Exception {
-    ManagerSaveException( String message) {
+import java.io.IOException;
+
+public class ManagerSaveException extends RuntimeException {
+    ManagerSaveException(String message) {
         super(message);
+    }
+
+    public ManagerSaveException(IOException e) {
     }
 }

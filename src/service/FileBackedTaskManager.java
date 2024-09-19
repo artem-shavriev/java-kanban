@@ -10,20 +10,12 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.Writer;
-import java.io.Reader;
 import java.io.FileReader;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    File backedFile;
-
-    public FileBackedTaskManager() {
-    }
+    static File backedFile;
 
     public FileBackedTaskManager(File backedFile) {
         this.backedFile = backedFile;
@@ -51,7 +43,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
 
     public void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(backedFile))) {
-            bufferedWriter.write("id,type,name,status,description,epic\n");
             for (Task task : super.getTasks()) {
                 bufferedWriter.write(toString((task)) + "\n");
             }
@@ -63,11 +54,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             for (Subtask subtask : super.getSubtasks()) {
                 bufferedWriter.write(toString(subtask) + "\n");
             }
-            throw new ManagerSaveException("Проблема с сохранением");
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-        } catch (ManagerSaveException e) {
-            System.out.println(e.getMessage());
+            throw new ManagerSaveException(e);
         }
     }
 
