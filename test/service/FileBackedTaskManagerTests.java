@@ -13,9 +13,7 @@ import org.junit.jupiter.api.Test;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -23,7 +21,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FileBackedTaskManagerTests {
     FileBackedTaskManager fileBackedTaskManager;
     File backedFile;
-
     {
         try {
             backedFile = File.createTempFile("backedFile", null);
@@ -89,11 +86,10 @@ public class FileBackedTaskManagerTests {
         Epic epic = new Epic(2,"Сделать ремонт", "Покрасить стены на балконе");
         fileBackedTaskManager.addEpic(epic);
 
-        Subtask subtask = new Subtask(10, 2,"Купить шпатель",
+        Subtask subtask = new Subtask(3, 2,"Купить шпатель",
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
         fileBackedTaskManager.addSubtask(subtask);
 
-        fileBackedTaskManager.save();
         ArrayList<String> array = new ArrayList<>();
 
         try(BufferedReader bufferedReader = new BufferedReader(new FileReader(fileBackedTaskManager.backedFile))) {
@@ -106,11 +102,31 @@ public class FileBackedTaskManagerTests {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-
-            assertEquals(fileBackedTaskManager.taskFromString(array.get(1)), task);
-            assertEquals(fileBackedTaskManager.taskFromString(array.get(2)), epic);
-            assertEquals(fileBackedTaskManager.taskFromString(array.get(3)), subtask);
-
+            assertEquals(fileBackedTaskManager.taskFromString(array.get(0)), task);
+            assertEquals(fileBackedTaskManager.taskFromString(array.get(1)), epic);
+            assertEquals(fileBackedTaskManager.taskFromString(array.get(2)), subtask);
     }
 
+    @Test
+    void shouldLoadFromFile() {
+        Task task = new Task(1, "Уборка", "Собрать и вынести мусор", TaskStatus.NEW);
+        fileBackedTaskManager.addTask(task);
+
+        Epic epic = new Epic(2, "Сделать ремонт", "Покрасить стены на балконе");
+        fileBackedTaskManager.addEpic(epic);
+
+        Subtask subtask = new Subtask(3, 2, "Купить шпатель",
+                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        fileBackedTaskManager.addSubtask(subtask);
+
+        FileBackedTaskManager newFileBackedTaskManager = new FileBackedTaskManager(backedFile);
+        newFileBackedTaskManager.loadFromFile(backedFile);
+
+        assertEquals(newFileBackedTaskManager.getTasks().get(0), task,
+                "Задача не загрузилась из файла");
+        assertEquals(newFileBackedTaskManager.getEpics().get(0), epic,
+                "Эпик не загрузился из файла");
+        assertEquals(newFileBackedTaskManager.getSubtasks().get(0), subtask,
+                "Подзадача не загрузилась из файла");
+    }
 }
