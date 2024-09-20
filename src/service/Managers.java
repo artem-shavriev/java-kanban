@@ -6,13 +6,13 @@ import java.io.IOException;
 public class Managers {
     public static TaskManager getDefault() {
         File backedFile;
-        {
-            try {
-                backedFile = File.createTempFile("backedFile", null);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
+
+        try {
+            backedFile = File.createTempFile("backedFile", null);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
+
         TaskManager manager = new FileBackedTaskManager(backedFile);
         return manager;
     }
