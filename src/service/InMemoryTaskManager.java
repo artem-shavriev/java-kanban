@@ -16,11 +16,11 @@ public class InMemoryTaskManager implements TaskManager {
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private HistoryManager historyManager = Managers.getDefaultHistory();
 
-    @Override
+    /*@Override
     public int generateNewId() {
         taskId++;
         return taskId;
-    }
+    }*/
 
     @Override
     public Task addTask(Task task) {
