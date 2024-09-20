@@ -9,18 +9,18 @@ import model.TaskType;
 public class TaskConvertor {
     public TaskConvertor() {
     }
+
     static String convertTaskToString(Task task) {
         String taskToString;
         if (task.getTaskType().equals(TaskType.SUBTASK)) {
             Subtask subtask = (Subtask) task;
             taskToString = String.format("%s,%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
-                    task.getNameOfTask(), task.getTaskStatus()
-                    ,task.getDescription(), subtask.getEpicId());
+                    task.getNameOfTask(), task.getTaskStatus(),
+                    task.getDescription(), subtask.getEpicId());
         } else {
             taskToString = String.format("%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
                     task.getNameOfTask(), task.getTaskStatus(), task.getDescription());
         }
-
         return taskToString;
     }
 
