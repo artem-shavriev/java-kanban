@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
-    //int generateNewId();
+    int generateNewId();
 
     Task addTask(Task task);
 
