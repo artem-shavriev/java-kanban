@@ -35,8 +35,6 @@ class InMemoryTaskManagerTests {
 
         assertNotNull(savedTask, "Задача не найдена.");
         assertEquals(task, savedTask, "Задачи не совпадают.");
-        assertNotEquals(234, taskId, "id не изменился на сгенерированный при добавлении.");
-
     }
 
     @Test
@@ -50,12 +48,11 @@ class InMemoryTaskManagerTests {
 
         assertNotNull(savedEpic, "Эпик не найден.");
         assertEquals(epic, savedEpic, "Эпики не совпадают.");
-        assertNotEquals(354, epicId, "id не изменился на сгенерированный при добавлении.");
     }
 
     @Test
     void shouldAddSubtask() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(1,"Поехать в отпуск", "Организовать путишествие");
         Subtask subtask = new Subtask(10, 1,"Купить шпатель",
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
 
@@ -67,13 +64,11 @@ class InMemoryTaskManagerTests {
 
         assertNotNull(savedSubtask, "Подзадача не найдена.");
         assertEquals(subtask, savedSubtask, "Подзадачи не совпадают.");
-        assertNotEquals(10, subtaskId, "id не изменился на сгенерированный при добавлении.");
-
     }
 
     @Test
     void shouldUpdateTask() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
 
         manager.addTask(task);
         int taskId = task.getId();
@@ -87,7 +82,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldUpdateEpic() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путешествие");
+        Epic epic = new Epic(323,"Поехать в отпуск", "Организовать путешествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -100,8 +95,8 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldUpdateSubtask() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 1,"Купить шпатель",
+        Epic epic = new Epic(53,"Поехать в отпуск", "Организовать путишествие");
+        Subtask subtask = new Subtask(10, 53,"Купить шпатель",
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
 
         manager.addEpic(epic);
@@ -116,7 +111,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetTaskById() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(5222,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
 
         manager.addTask(task);
         int taskId = task.getId();
@@ -127,7 +122,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetEpicById() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путешествие");
+        Epic epic = new Epic(532,"Поехать в отпуск", "Организовать путешествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -138,8 +133,8 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetSubtaskById() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 1,"Купить шпатель",
+        Epic epic = new Epic(5214,"Поехать в отпуск", "Организовать путишествие");
+        Subtask subtask = new Subtask(10, 5214,"Купить шпатель",
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
 
         manager.addEpic(epic);
@@ -153,7 +148,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetTasks() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(3,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
 
         manager.addTask(task);
 
@@ -166,7 +161,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetEpics() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(5,"Поехать в отпуск", "Организовать путишествие");
 
         manager.addEpic(epic);
 
@@ -179,8 +174,8 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetSubtasks() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 1,"Купить шпатель",
+        Epic epic = new Epic(51,"Поехать в отпуск", "Организовать путишествие");
+        Subtask subtask = new Subtask(10, 51,"Купить шпатель",
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
 
         manager.addEpic(epic);
@@ -195,7 +190,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetSubtasksOfEpic() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(124,"Поехать в отпуск", "Организовать путишествие");
         manager.addEpic(epic);
         int epicId = epic.getId();
 
@@ -214,7 +209,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveTaskById() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(6,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
 
         manager.addTask(task);
         int taskId = task.getId();
@@ -225,7 +220,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveEpicById() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(73,"Поехать в отпуск", "Организовать путишествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -236,7 +231,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveSubtaskById() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(8,"Поехать в отпуск", "Организовать путишествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -253,7 +248,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveTasks() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(36,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
 
         manager.addTask(task);
         assertEquals(task, manager.getTasks().get(0));
@@ -264,7 +259,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveEpics() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(44,"Поехать в отпуск", "Организовать путишествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -284,7 +279,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveSubtasks() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(84,"Поехать в отпуск", "Организовать путишествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -306,7 +301,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldUpdateEpicStatus() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(363,"Поехать в отпуск", "Организовать путишествие");
 
         manager.addEpic(epic);
         int epicId = epic.getId();
@@ -329,10 +324,10 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetHistoryFromHistoryManager() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(3633,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
         manager.addTask(task);
         int taskId = task.getId();
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путишествие");
+        Epic epic = new Epic(33,"Поехать в отпуск", "Организовать путишествие");
         manager.addEpic(epic);
         int epicId = epic.getId();
         Subtask subtask = new Subtask(10, epicId,"Выбрать курорт",
@@ -352,7 +347,7 @@ class InMemoryTaskManagerTests {
     }
     @Test
     void immutabilityOfTheTask() {
-        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(25,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
         manager.addTask(task);
         int taskId = task.getId();
 
@@ -389,7 +384,7 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldNotAddSubtaskWithSimilarEpicId() {
-        Epic epic = new Epic("Поехать в отпуск", "Организовать путешествие");
+        Epic epic = new Epic(22,"Поехать в отпуск", "Организовать путешествие");
         manager.addEpic(epic);
         int epicId = epic.getId();
 
@@ -397,10 +392,7 @@ class InMemoryTaskManagerTests {
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
         manager.addSubtask(subtask);
 
-        int subtaskId = subtask.getId();
-        int epicIdOfSubtask = manager.getSubtaskById(subtaskId).getEpicId();
-
-        assertNotEquals(subtaskId, epicIdOfSubtask, "id подзадачи совпадает с ее epicId.");
+        assertNull(manager.getSubtaskById(epicId), "Подзадача с id идентичным id ее эпика была добавлена.");
 
     }
 

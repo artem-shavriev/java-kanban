@@ -21,17 +21,18 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         this.backedFile = backedFile;
     }
 
-    void loadFromFile(File file) {
+    static FileBackedTaskManager loadFromFile(File file) {
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             while (bufferedReader.ready()) {
                 String taskString = bufferedReader.readLine();
-                Task task = taskFromString(taskString);
+                Task task = TaskConvertor.convertTaskFromString(taskString);
                 if (task.getTaskType().equals(TaskType.TASK)) {
-                    super.addTask(task);
+                    fileBackedTaskManager.addTask(task);
                 } else if (task.getTaskType().equals(TaskType.EPIC)) {
-                    super.addEpic((Epic) task);
+                    fileBackedTaskManager.addEpic((Epic) task);
                 } else if (task.getTaskType().equals(TaskType.SUBTASK)) {
-                    super.addSubtask((Subtask) task);
+                    fileBackedTaskManager.addSubtask((Subtask) task);
                 }
             }
         } catch (FileNotFoundException e) {
@@ -39,57 +40,24 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        return fileBackedTaskManager;
     }
 
     public void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(backedFile))) {
             for (Task task : super.getTasks()) {
-                bufferedWriter.write(toString((task)) + "\n");
+                bufferedWriter.write(TaskConvertor.convertTaskToString(task) + "\n");
             }
 
             for (Epic epic : super.getEpics()) {
-                bufferedWriter.write(toString(epic) + "\n");
+                bufferedWriter.write(TaskConvertor.convertTaskToString(epic) + "\n");
             }
 
             for (Subtask subtask : super.getSubtasks()) {
-                bufferedWriter.write(toString(subtask) + "\n");
+                bufferedWriter.write(TaskConvertor.convertTaskToString(subtask) + "\n");
             }
         } catch (IOException e) {
             throw new ManagerSaveException(e);
-        }
-    }
-
-    String toString(Task task) {
-        String taskToString;
-        if (task.getTaskType().equals(TaskType.SUBTASK)) {
-            Subtask subtask = (Subtask) task;
-            taskToString = task.getId() + "," + task.getTaskType() + ","
-                    + task.getNameOfTask() + "," + task.getTaskStatus() + ","
-                    + task.getDescription() + "," + subtask.getEpicId();
-        } else {
-            taskToString = task.getId() + "," + task.getTaskType() + ","
-                    + task.getNameOfTask() + "," + task.getTaskStatus() + ","
-                    + task.getDescription();
-        }
-
-        return taskToString;
-    }
-
-    Task taskFromString(String value) {
-        String[] array = value.split(",");
-        int id = Integer.valueOf(array[0]);
-        TaskType type = TaskType.valueOf(array[1]);
-        String name = array[2];
-        TaskStatus status = TaskStatus.valueOf(array[3]);
-        String description = array[4];
-
-        if (type.equals(TaskType.SUBTASK)) {
-            int epicId = Integer.valueOf(array[5]);
-            return new Subtask(id, type, name, status, description, epicId);
-        } else if (type.equals(TaskType.TASK)) {
-            return new Task(id, type, name, status, description);
-        } else {
-            return new Epic(id, type, name, status, description);
         }
     }
 
@@ -136,24 +104,21 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     @Override
-    public Task removeTaskById(int id) {
+    public void removeTaskById(int id) {
         super.removeTaskById(id);
         save();
-        return super.getTaskById(id);
     }
 
     @Override
-    public Subtask removeSubtaskById(int id) {
+    public void removeSubtaskById(int id) {
         super.removeSubtaskById(id);
         save();
-        return super.getSubtaskById(id);
     }
 
     @Override
-    public Epic removeEpicById(int id) {
+    public void removeEpicById(int id) {
         super.removeEpicById(id);
         save();
-        return super.getEpicById(id);
     }
 
     @Override

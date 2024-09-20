@@ -9,18 +9,18 @@ import service.TaskManager;
 public class Main {
     public static void main(String[] args) {
         TaskManager taskManager = Managers.getDefault();
-        Task task1 = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
-        Task task2 = new Task("Готовка", "Приготовить еду",  TaskStatus.NEW);
-        Task task3 = new Task("Стирка", "Постирать вещи",  TaskStatus.NEW);
-        Epic epic1 = new Epic("Поехать в отпуск", "Организовать путешествие");
-        Epic epic2 = new Epic("Сделать ремонт", "Покрасить стены на балконе");
-        Subtask subtask1 = new Subtask(10, 5,"Купить шпатель",
+        Task task1 = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task2 = new Task(2,"Готовка", "Приготовить еду",  TaskStatus.NEW);
+        Task task3 = new Task(3,"Стирка", "Постирать вещи",  TaskStatus.NEW);
+        Epic epic1 = new Epic(4,"Поехать в отпуск", "Организовать путешествие");
+        Epic epic2 = new Epic(5,"Сделать ремонт", "Покрасить стены на балконе");
+        Subtask subtask1 = new Subtask(6, 5,"Купить шпатель",
                 "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
-        Subtask subtask2 = new Subtask(11, 5,"Купить краску",
+        Subtask subtask2 = new Subtask(7, 5,"Купить краску",
                 "Выбрать краску и купить", TaskStatus.DONE);
-        Subtask subtask3 = new Subtask(12, 4,"Выбрать курорт",
+        Subtask subtask3 = new Subtask(8, 4,"Выбрать курорт",
                 "Изучить варинты гостиниц и забронировать", TaskStatus.IN_PROGRESS);
-        Subtask subtaskForUpdate = new Subtask(8, 4,"Выбрать курорт",
+        Subtask subtaskForUpdate = new Subtask(9, 4,"Выбрать курорт",
                 "Изучить варинты гостиниц и забронировать", TaskStatus.DONE);
 
         taskManager.addTask(task1);
