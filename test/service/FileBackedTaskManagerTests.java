@@ -195,8 +195,7 @@ public class FileBackedTaskManagerTests {
         fileBackedTaskManager.addTask(task2);
 
         FileBackedTaskManager newFileBackedTaskManager = FileBackedTaskManager.loadFromFile(backedFile);
-//После создания менджера и загрузки задач, новые задачи без нумерации id,
-// пропадают так как генератор генерирует их опять с 1, и они совпадают с id загруженных.
+
         Task task3 = new Task("Уборка3", "Собрать и вынести мусор3",  TaskStatus.NEW);
         Task task4 = new Task("Уборка4", "Собрать и вынести мусор4",  TaskStatus.NEW);
         Task task5 = new Task("Уборк5", "Собрать и вынести мусор5",  TaskStatus.NEW);
