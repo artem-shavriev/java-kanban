@@ -7,10 +7,8 @@ import model.TaskStatus;
 import model.TaskType;
 
 public class TaskConvertor {
-    public TaskConvertor() {
-    }
 
-    static String convertTaskToString(Task task) {
+    public static String convertTaskToString(Task task) {
         String taskToString;
         if (task.getTaskType().equals(TaskType.SUBTASK)) {
             Subtask subtask = (Subtask) task;
@@ -24,7 +22,7 @@ public class TaskConvertor {
         return taskToString;
     }
 
-    static Task convertTaskFromString(String value) {
+    public static Task convertTaskFromString(String value) {
         String[] array = value.split(",");
         int id = Integer.valueOf(array[0]);
         TaskType type = TaskType.valueOf(array[1]);

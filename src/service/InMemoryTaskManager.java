@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int taskId = 0;
+    private int generateId = 0;
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
@@ -18,8 +18,12 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public int generateNewId() {
-        taskId++;
-        return taskId;
+        generateId++;
+        return generateId;
+    }
+
+    public void setGenerateId(int generateId) {
+        this.generateId = generateId;
     }
 
     @Override
@@ -27,11 +31,11 @@ public class InMemoryTaskManager implements TaskManager {
         int  id;
         if (task.getId() == null) {
             id = generateNewId();
+            task.setId(id);
         } else {
             id = task.getId();
         }
         tasks.put(id, task);
-        task.setId(id);
         return task;
     }
 
@@ -39,11 +43,11 @@ public class InMemoryTaskManager implements TaskManager {
         int id;
         if (epic.getId() == null) {
             id = generateNewId();
+            epic.setId(id);
         } else {
             id = epic.getId();
         }
         epics.put(id, epic);
-        epic.setId(id);
         return epic;
     }
 
@@ -55,12 +59,12 @@ public class InMemoryTaskManager implements TaskManager {
         if (subtask != null && subtask.getId() != epic.getId()) {
             if (subtask.getId() == null) {
                 id = generateNewId();
+                subtask.setId(id);
             } else {
                 id = subtask.getId();
             }
             subtask.setEpicId(epic.getId());
             subtasks.put(id, subtask);
-            subtask.setId(id);
             epic.setSubtaskId(id);
             updateEpicStatus(epics.get(subtask.getEpicId()));
             return subtask;

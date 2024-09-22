@@ -1,18 +1,10 @@
 package service;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Managers {
-    public static TaskManager getDefault() {
-        File backedFile;
 
-        try {
-            backedFile = File.createTempFile("backedFile", null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-
+    public static TaskManager getDefault(File backedFile) {
         TaskManager manager = new FileBackedTaskManager(backedFile);
         return manager;
     }

@@ -7,11 +7,12 @@ import model.TaskStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -22,7 +23,15 @@ class InMemoryTaskManagerTests {
 
     @BeforeEach
     public void beforeEach() {
-        manager = Managers.getDefault();
+        File backedFile;
+        {
+            try {
+                backedFile = File.createTempFile("backedFile", null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        manager = Managers.getDefault(backedFile);
     }
 
     @Test
@@ -53,8 +62,8 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldAddSubtask() {
         Epic epic = new Epic(1,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 1,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -96,16 +105,16 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldUpdateSubtask() {
         Epic epic = new Epic(53,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 53,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 53);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
 
         int subtaskId = subtask.getId();
 
-        Subtask subtaskForUpdating = new Subtask(subtaskId, 1,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtaskForUpdating = new Subtask(subtaskId, "Купить шпатель", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 1);
 
     }
 
@@ -134,8 +143,8 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldGetSubtaskById() {
         Epic epic = new Epic(5214,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 5214,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 5214);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -175,8 +184,8 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldGetSubtasks() {
         Epic epic = new Epic(51,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, 51,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 51);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -194,8 +203,8 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10, epicId,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10,"Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", epicId);
         manager.addSubtask(subtask);
 
         ArrayList<Subtask> subtasks = new ArrayList<>();
@@ -236,8 +245,8 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10, epicId,"Выбрать курорт",
-                "Изучить варинты гостиниц и забронировать", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Выбрать курорт",  TaskStatus.NEW,
+                "Изучить варинты гостиниц и забронировать", epicId);
 
         manager.addSubtask(subtask);
         int subtaskId = subtask.getId();
@@ -264,8 +273,8 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10, epicId,"Выбрать курорт",
-                "Изучить варинты гостиниц и забронировать", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10,"Выбрать курорт",  TaskStatus.NEW,
+                "Изучить варинты гостиниц и забронировать", epicId);
 
         manager.addSubtask(subtask);
 
@@ -284,8 +293,8 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10, epicId,"Выбрать курорт",
-                "Изучить варинты гостиниц и забронировать", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10,"Выбрать курорт",  TaskStatus.NEW,
+                "Изучить варинты гостиниц и забронировать", epicId);
         int subtaskId = subtask.getId();
 
         manager.addSubtask(subtask);
@@ -306,10 +315,10 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask1 = new Subtask(10, epicId,"Выбрать курорт",
-                "Изучить варинты гостиниц и забронировать", TaskStatus.NEW);
-        Subtask subtask2 = new Subtask(11, epicId,"Загазать билеты",
-                "Выбрать самые выгодные билеты", TaskStatus.DONE);
+        Subtask subtask1 = new Subtask(10,"Выбрать курорт",  TaskStatus.NEW,
+                "Изучить варинты гостиниц и забронировать", epicId);
+        Subtask subtask2 = new Subtask(11,"Загазать билеты",  TaskStatus.DONE,
+                "Выбрать самые выгодные билеты", epicId);
 
         manager.addSubtask(subtask1);
         assertEquals(epic.getTaskStatus(), subtask1.getTaskStatus(), "Некорректный статус эпика.");
@@ -330,8 +339,8 @@ class InMemoryTaskManagerTests {
         Epic epic = new Epic(33,"Поехать в отпуск", "Организовать путишествие");
         manager.addEpic(epic);
         int epicId = epic.getId();
-        Subtask subtask = new Subtask(10, epicId,"Выбрать курорт",
-                "Изучить варинты гостиниц и забронировать", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10,"Выбрать курорт", TaskStatus.NEW,
+                "Изучить варинты гостиниц и забронировать", epicId);
         manager.addSubtask(subtask);
         int subtaskId = subtask.getId();
 
@@ -388,8 +397,8 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(epicId, epicId,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(epicId, "Купить шпатель", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",epicId);
         manager.addSubtask(subtask);
 
         assertNull(manager.getSubtaskById(epicId), "Подзадача с id идентичным id ее эпика была добавлена.");
@@ -401,16 +410,16 @@ class InMemoryTaskManagerTests {
         Epic epic = new Epic(1,"Поехать в отпуск", "Организовать путешествие");
         manager.addEpic(epic);
 
-        Subtask subtask1 = new Subtask(2, 1,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask1 = new Subtask(2, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",1);
         manager.addSubtask(subtask1);
 
-        Subtask subtask2 = new Subtask(3, 1,"Купить краску",
-                "Выбрать краску и купить", TaskStatus.DONE);
+        Subtask subtask2 = new Subtask(3, "Купить краску", TaskStatus.DONE,
+                "Выбрать краску и купить", 1);
         manager.addSubtask(subtask2);
 
-        Subtask subtask3 = new Subtask(4, 1,"Выбрать курорт",
-                "Изучить варинты гостиниц и забронировать", TaskStatus.IN_PROGRESS);
+        Subtask subtask3 = new Subtask(4, "Выбрать курорт",  TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать", 1);
         manager.addSubtask(subtask3);
 
         ArrayList<Integer> subtasksIds = manager.getEpicById(1).getSubtasksIds();

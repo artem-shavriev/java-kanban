@@ -14,18 +14,22 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
-    static File backedFile;
+    File backedFile;
 
     public FileBackedTaskManager(File backedFile) {
         this.backedFile = backedFile;
     }
 
-    static FileBackedTaskManager loadFromFile(File file) {
+    public static FileBackedTaskManager loadFromFile(File file) {
         FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
+        int startId = 0;
         try (BufferedReader bufferedReader = new BufferedReader(new FileReader(file))) {
             while (bufferedReader.ready()) {
                 String taskString = bufferedReader.readLine();
                 Task task = TaskConvertor.convertTaskFromString(taskString);
+                if (task.getId() > startId) {
+                    startId = task.getId();
+                }
                 if (task.getTaskType().equals(TaskType.TASK)) {
                     fileBackedTaskManager.addTask(task);
                 } else if (task.getTaskType().equals(TaskType.EPIC)) {
@@ -39,10 +43,11 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
+        fileBackedTaskManager.setGenerateId(startId);
         return fileBackedTaskManager;
     }
 
-    public void save() {
+    private void save() {
         try (BufferedWriter bufferedWriter = new BufferedWriter(new FileWriter(backedFile))) {
             for (Task task : super.getTasks()) {
                 bufferedWriter.write(TaskConvertor.convertTaskToString(task) + "\n");

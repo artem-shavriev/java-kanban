@@ -24,8 +24,8 @@ public class InMemoryHistoryManagerTests {
         Epic epic = new Epic(2,"Сделать ремонт", "Покрасить стены на балконе");
         historyManager.add(epic);
 
-        Subtask subtask = new Subtask(10, 2,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 2);
         historyManager.add(subtask);
 
         assertNotNull(historyManager.getHistory().get(0), "Задача не добавилась в историю.");
@@ -56,13 +56,13 @@ public class InMemoryHistoryManagerTests {
         historyManager.add(epic);
         historyManager.add(epic);
 
-        Subtask subtask = new Subtask(10, 2,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",2);
         historyManager.add(subtask);
         historyManager.add(subtask);
 
-        Subtask subtask2 = new Subtask(11, 2,"Купить краску",
-                "Выбрать краску и купить", TaskStatus.DONE);
+        Subtask subtask2 = new Subtask(11, "Купить краску", TaskStatus.DONE,
+                "Выбрать краску и купить",2);
         historyManager.add(subtask2);
 
         assertNotEquals(historyManager.getHistory().get(0), historyManager.getHistory().get(1),

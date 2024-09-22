@@ -49,4 +49,6 @@ public interface TaskManager {
     void removeSubtasks();
 
     List<Task> getHistory();
+
+    void setGenerateId(int id);
 }

@@ -4,7 +4,6 @@ import model.Epic;
 import model.Subtask;
 import model.Task;
 import model.TaskStatus;
-import model.TaskType;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -85,8 +84,8 @@ public class FileBackedTaskManagerTests {
         Epic epic = new Epic(2,"Сделать ремонт", "Покрасить стены на балконе");
         fileBackedTaskManager.addEpic(epic);
 
-        Subtask subtask = new Subtask(3, 2,"Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(3, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 2);
         fileBackedTaskManager.addSubtask(subtask);
 
         ArrayList<String> array = new ArrayList<>();
@@ -114,8 +113,8 @@ public class FileBackedTaskManagerTests {
         Epic epic = new Epic(2, "Сделать ремонт", "Покрасить стены на балконе");
         fileBackedTaskManager.addEpic(epic);
 
-        Subtask subtask = new Subtask(5, 2, "Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(5,  "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 2);
         fileBackedTaskManager.addSubtask(subtask);
 
         Task task2 = new Task(3, "Уборка2", "Собрать и вынести мусор2", TaskStatus.NEW);
@@ -124,8 +123,8 @@ public class FileBackedTaskManagerTests {
         Epic epic2 = new Epic(4, "Сделать ремонт2", "Покрасить стены на балконе2");
         fileBackedTaskManager.addEpic(epic2);
 
-        Subtask subtask2 = new Subtask(6, 4, "Купить шпатель2",
-                "Выбрать в магазине шпатель и купить2", TaskStatus.NEW);
+        Subtask subtask2 = new Subtask(6, "Купить шпатель2",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить2", 4);
         fileBackedTaskManager.addSubtask(subtask2);
 
         FileBackedTaskManager newFileBackedTaskManager = FileBackedTaskManager.loadFromFile(backedFile);
@@ -154,8 +153,8 @@ public class FileBackedTaskManagerTests {
         Epic epic = new Epic(24, "Сделать ремонт", "Покрасить стены на балконе");
         fileBackedTaskManager.addEpic(epic);
 
-        Subtask subtask = new Subtask(55, 24, "Купить шпатель",
-                "Выбрать в магазине шпатель и купить", TaskStatus.NEW);
+        Subtask subtask = new Subtask(55, "Купить шпатель", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить", 24);
         fileBackedTaskManager.addSubtask(subtask);
 
         Task task2 = new Task(653, "Уборка2", "Собрать и вынести мусор2", TaskStatus.NEW);
@@ -164,8 +163,8 @@ public class FileBackedTaskManagerTests {
         Epic epic2 = new Epic(444, "Сделать ремонт2", "Покрасить стены на балконе2");
         fileBackedTaskManager.addEpic(epic2);
 
-        Subtask subtask2 = new Subtask(634, 444, "Купить шпатель2",
-                "Выбрать в магазине шпатель и купить2", TaskStatus.NEW);
+        Subtask subtask2 = new Subtask(634, "Купить шпатель2",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить2", 444);
         fileBackedTaskManager.addSubtask(subtask2);
 
         FileBackedTaskManager newFileBackedTaskManager = FileBackedTaskManager.loadFromFile(backedFile);
@@ -184,5 +183,30 @@ public class FileBackedTaskManagerTests {
                 "Подзадача не загрузилась из файла");
         assertEquals(newFileBackedTaskManager.getSubtasks().get(1).getId(), subtask2.getId(),
                 "Подзадача не загрузилась из файла");
+    }
+
+    @Test
+    void shouldNotAddTaskWithSimilarId() {
+        Task task = new Task("Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task1 = new Task("Уборка1", "Собрать и вынести мусор1",  TaskStatus.NEW);
+        Task task2 = new Task("Уборка2", "Собрать и вынести мусор2",  TaskStatus.NEW);
+        fileBackedTaskManager.addTask(task);
+        fileBackedTaskManager.addTask(task1);
+        fileBackedTaskManager.addTask(task2);
+
+        FileBackedTaskManager newFileBackedTaskManager = FileBackedTaskManager.loadFromFile(backedFile);
+//После создания менджера и загрузки задач, новые задачи без нумерации id,
+// пропадают так как генератор генерирует их опять с 1, и они совпадают с id загруженных.
+        Task task3 = new Task("Уборка3", "Собрать и вынести мусор3",  TaskStatus.NEW);
+        Task task4 = new Task("Уборка4", "Собрать и вынести мусор4",  TaskStatus.NEW);
+        Task task5 = new Task("Уборк5", "Собрать и вынести мусор5",  TaskStatus.NEW);
+
+        newFileBackedTaskManager.addTask(task3);
+        newFileBackedTaskManager.addTask(task4);
+        newFileBackedTaskManager.addTask(task5);
+
+        for (Task t : newFileBackedTaskManager.getTasks()) {
+            System.out.println(t);
+        }
     }
 }

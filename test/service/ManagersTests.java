@@ -1,6 +1,10 @@
 package service;
 
 import org.junit.jupiter.api.Test;
+
+import java.io.File;
+import java.io.IOException;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class ManagersTests {
@@ -8,7 +12,15 @@ public class ManagersTests {
 
     @Test
     void shouldGetDefaultInMemoryTaskManager() {
-        TaskManager taskManager = Managers.getDefault();
+        File backedFile;
+        {
+            try {
+                backedFile = File.createTempFile("backedFile", null);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        TaskManager taskManager = Managers.getDefault(backedFile);
 
         assertNotNull(taskManager, "Некорректный экземпляр менеджера TaskManager");
     }
