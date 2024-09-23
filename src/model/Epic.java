@@ -5,13 +5,24 @@ import java.util.ArrayList;
 public class Epic extends Task {
     private ArrayList<Integer> subtasksIds = new ArrayList<>();
 
-    //конструктор с id для целей тестирования
+    public Epic(int id, String nameOfTask, TaskStatus taskStatus, String description) {
+        super(id, nameOfTask, taskStatus, description);
+        this.taskType = taskType.EPIC;
+    }
+
     public Epic(int id, String nameOfTask, String description) {
         super(id, nameOfTask, description);
+        this.taskType = taskType.EPIC;
     }
 
     public Epic(String nameOfTask, String description) {
         super(nameOfTask, description);
+        this.taskType = taskType.EPIC;
+    }
+
+    @Override
+    public TaskType getTaskType() {
+        return taskType.EPIC;
     }
 
     public void setSubtaskId(int id) {

@@ -7,8 +7,8 @@ public class Task {
     private String description;
     private Integer id;
     private TaskStatus taskStatus;
+    protected TaskType taskType;
 
-    //конструктор с id для целей тестирования
     public Task(int id, String nameOfTask, String description, TaskStatus taskStatus) {
         this.id = id;
         this.description = description;
@@ -22,6 +22,14 @@ public class Task {
         this.nameOfTask = nameOfTask;
     }
 
+    public Task(int id, String nameOfTask, TaskStatus taskStatus, String description) {
+        this.id = id;
+        this.taskType = taskType.TASK;
+        this.nameOfTask = nameOfTask;
+        this.taskStatus = taskStatus;
+        this.description = description;
+    }
+
     public Task(String nameOfTask, String description, TaskStatus taskStatus) {
         this.nameOfTask = nameOfTask;
         this.description = description;
@@ -32,6 +40,10 @@ public class Task {
         this.nameOfTask = nameOfTask;
         this.description = description;
 
+    }
+
+    public TaskType getTaskType() {
+        return taskType.TASK;
     }
 
     public String getNameOfTask() {
@@ -62,7 +74,7 @@ public class Task {
         this.id = id;
     }
 
-    public int getId() {
+    public Integer getId() {
         return id;
     }
 

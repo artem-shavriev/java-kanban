@@ -10,46 +10,65 @@ import java.util.List;
 import java.util.HashMap;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int taskId = 0;
+    private int generateId = 0;
     private HashMap<Integer, Task> tasks = new HashMap<>();
     private HashMap<Integer, Epic> epics = new HashMap<>();
     private HashMap<Integer, Subtask> subtasks = new HashMap<>();
     private HistoryManager historyManager = Managers.getDefaultHistory();
 
-    @Override
     public int generateNewId() {
-        taskId++;
-        return taskId;
+        generateId++;
+        return generateId;
+    }
+
+    public void setGenerateId(int generateId) {
+        this.generateId = generateId;
     }
 
     @Override
     public Task addTask(Task task) {
-        int newId = generateNewId();
-        tasks.put(newId, task);
-        task.setId(newId);
+        int  id;
+        if (task.getId() == null) {
+            id = generateNewId();
+            task.setId(id);
+        } else {
+            id = task.getId();
+        }
+        tasks.put(id, task);
         return task;
     }
 
-    @Override
     public Epic addEpic(Epic epic) {
-        int newId = generateNewId();
-        epics.put(newId, epic);
-        epic.setId(newId);
+        int id;
+        if (epic.getId() == null) {
+            id = generateNewId();
+            epic.setId(id);
+        } else {
+            id = epic.getId();
+        }
+        epics.put(id, epic);
         return epic;
     }
 
     @Override
     public Subtask addSubtask(Subtask subtask) {
+        int id;
         Epic epic = epics.get(subtask.getEpicId());
-        if (subtask != null) {
-            int newId = generateNewId();
+
+        if (subtask != null && subtask.getId() != epic.getId()) {
+            if (subtask.getId() == null) {
+                id = generateNewId();
+                subtask.setId(id);
+            } else {
+                id = subtask.getId();
+            }
             subtask.setEpicId(epic.getId());
-            subtasks.put(newId, subtask);
-            subtask.setId(newId);
-            epic.setSubtaskId(newId);
+            subtasks.put(id, subtask);
+            epic.setSubtaskId(id);
             updateEpicStatus(epics.get(subtask.getEpicId()));
             return subtask;
         } else {
+            System.out.println("id подзадачи не может совпадать с id ее эпика, подзадача не добавлена.");
             return null;
         }
     }
@@ -176,20 +195,18 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public Task removeTaskById(int id) {
+    public void removeTaskById(int id) {
         if (tasks.containsKey(id)) {
             Task task = tasks.get(id);
             tasks.remove(id);
             historyManager.remove(id);
-            return task;
         } else {
             System.out.println("Задачи с данным id не существует");
-            return null;
         }
     }
 
     @Override
-    public Subtask removeSubtaskById(int id) {
+    public void removeSubtaskById(int id) {
         if (subtasks.containsKey(id)) {
             Subtask subtask = subtasks.get(id);
             int epicId = subtask.getEpicId();
@@ -199,15 +216,13 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.remove(id);
             epicOfSubtask.removeSubtaskIdById(id);
             updateEpicStatus(epicOfSubtask);
-            return subtask;
         } else {
             System.out.println("Подзадачи с данным id не существует");
-            return null;
         }
     }
 
     @Override
-    public Epic removeEpicById(int id) {
+    public void removeEpicById(int id) {
         if (epics.containsKey(id)) {
             Epic epic = epics.get(id);
             ArrayList<Integer> idsForRemove = epic.getSubtasksIds();
@@ -218,10 +233,8 @@ public class InMemoryTaskManager implements TaskManager {
             }
             epics.remove(id);
             historyManager.remove(id);
-            return epic;
         } else {
             System.out.println("Эпика с данным id не существует");
-            return null;
         }
     }
 

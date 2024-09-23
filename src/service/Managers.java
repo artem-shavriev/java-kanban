@@ -1,8 +1,11 @@
 package service;
 
+import java.io.File;
+
 public class Managers {
-    public static TaskManager getDefault() {
-        TaskManager manager = new InMemoryTaskManager();
+
+    public static TaskManager getDefault(File backedFile) {
+        TaskManager manager = new FileBackedTaskManager(backedFile);
         return manager;
     }
 
