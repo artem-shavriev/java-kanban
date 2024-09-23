@@ -13,16 +13,16 @@ public class Main {
         File backedFile = new File ("data.csv");
 
         TaskManager taskManager = Managers.getDefault(backedFile);
-        Task task1 = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
-        Task task2 = new Task(2,"Готовка", "Приготовить еду",  TaskStatus.NEW);
-        Task task3 = new Task(3,"Стирка", "Постирать вещи",  TaskStatus.NEW);
+        Task task1 = new Task(1,"Уборка", "Собрать и вынести мусор", TaskStatus.NEW);
+        Task task2 = new Task(2,"Готовка", "Приготовить еду", TaskStatus.NEW);
+        Task task3 = new Task(3,"Стирка", "Постирать вещи", TaskStatus.NEW);
         Epic epic1 = new Epic(4,"Поехать в отпуск", "Организовать путешествие");
         Epic epic2 = new Epic(5,"Сделать ремонт", "Покрасить стены на балконе");
         Subtask subtask1 = new Subtask(6, "Купить шпатель", TaskStatus.NEW,
                 "Выбрать в магазине шпатель и купить",5);
-        Subtask subtask2 = new Subtask(7, "Купить краску",  TaskStatus.DONE,
+        Subtask subtask2 = new Subtask(7, "Купить краску", TaskStatus.DONE,
                 "Выбрать краску и купить", 5);
-        Subtask subtask3 = new Subtask(8,"Выбрать курорт",  TaskStatus.IN_PROGRESS,
+        Subtask subtask3 = new Subtask(8,"Выбрать курорт", TaskStatus.IN_PROGRESS,
                 "Изучить варинты гостиниц и забронировать", 4);
         Subtask subtaskForUpdate = new Subtask(9, "Выбрать курорт", TaskStatus.DONE,
                 "Изучить варинты гостиниц и забронировать", 4);
