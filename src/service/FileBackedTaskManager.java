@@ -61,7 +61,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 bufferedWriter.write(TaskConvertor.convertTaskToString(subtask) + "\n");
             }
         } catch (IOException e) {
-            throw new ManagerSaveException(e);
+            System.out.println("Произошла ошибка: " + e.getMessage());
+            throw new ManagerSaveException("Произошла ошибка: " + e.getMessage());
         }
     }
 
