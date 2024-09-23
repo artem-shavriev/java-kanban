@@ -16,7 +16,7 @@ public class TaskConvertor {
                     task.getNameOfTask(), task.getTaskStatus(),
                     task.getDescription(), subtask.getEpicId());
         } else {
-            taskToString = String.format("%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
+            taskToString = String.format("%s,%s,%s,%s,%s,", task.getId(), task.getTaskType(),
                     task.getNameOfTask(), task.getTaskStatus(), task.getDescription());
         }
         return taskToString;

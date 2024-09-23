@@ -62,7 +62,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
             }
         } catch (IOException e) {
             System.out.println("Произошла ошибка: " + e.getMessage());
-            throw new ManagerSaveException("Произошла ошибка: " + e.getMessage());
+            throw new ManagerSaveException("Произошла ошибка сохранения.");
         }
     }
 

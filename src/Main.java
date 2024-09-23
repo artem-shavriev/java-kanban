@@ -7,17 +7,10 @@ import service.Managers;
 import service.TaskManager;
 
 import java.io.File;
-import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        File backedFile;
-
-        try {
-            backedFile = File.createTempFile("backedFile", null);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        File backedFile = new File ("data.csv");
 
         TaskManager taskManager = Managers.getDefault(backedFile);
         Task task1 = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);

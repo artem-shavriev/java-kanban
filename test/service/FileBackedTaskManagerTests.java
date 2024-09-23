@@ -44,8 +44,8 @@ public class FileBackedTaskManagerTests {
         Subtask subtask = new Subtask(3, "Купить шпатель", TaskStatus.NEW,
                 "Выбрать в магазине шпатель и купить", 2);
 
-        String taskToString = "1,TASK,Уборка,NEW,Собрать и вынести мусор";
-        String epicToString = "2,EPIC,Сделать ремонт,NEW,Покрасить стены на балконе";
+        String taskToString = "1,TASK,Уборка,NEW,Собрать и вынести мусор,";
+        String epicToString = "2,EPIC,Сделать ремонт,NEW,Покрасить стены на балконе,";
         String subtaskToString = "3,SUBTASK,Купить шпатель,NEW,Выбрать в магазине шпатель и купить,2";
 
         assertEquals(taskToString, TaskConvertor.convertTaskToString(task),
