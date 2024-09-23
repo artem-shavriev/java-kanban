@@ -10,7 +10,7 @@ import java.io.File;
 
 public class Main {
     public static void main(String[] args) {
-        File backedFile = new File ("data.csv");
+        File backedFile = new File("data.csv");
 
         TaskManager taskManager = Managers.getDefault(backedFile);
         Task task1 = new Task(1,"Уборка", "Собрать и вынести мусор", TaskStatus.NEW);
