@@ -6,18 +6,26 @@ import model.Task;
 import model.TaskStatus;
 import model.TaskType;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
+
 public class TaskConvertor {
 
     public static String convertTaskToString(Task task) {
         String taskToString;
+
         if (task.getTaskType().equals(TaskType.SUBTASK)) {
             Subtask subtask = (Subtask) task;
-            taskToString = String.format("%s,%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
-                    task.getNameOfTask(), task.getTaskStatus(),
-                    task.getDescription(), subtask.getEpicId());
-        } else {
-            taskToString = String.format("%s,%s,%s,%s,%s,", task.getId(), task.getTaskType(),
+            taskToString = String.format("%s,%s,%s,%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
+                    task.getNameOfTask(), task.getTaskStatus(), task.getDescription(),
+                    subtask.getStartTime(), subtask.getDuration().toMinutes(), subtask.getEpicId());
+        } else if (task.getTaskType().equals(TaskType.EPIC)){
+            taskToString = String.format("%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
                     task.getNameOfTask(), task.getTaskStatus(), task.getDescription());
+        } else {
+            taskToString = String.format("%s,%s,%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
+                    task.getNameOfTask(), task.getTaskStatus(), task.getDescription(),
+                    task.getStartTime(), task.getDuration().toMinutes());
         }
         return taskToString;
     }
@@ -31,10 +39,16 @@ public class TaskConvertor {
         String description = array[4];
 
         if (type.equals(TaskType.SUBTASK)) {
-            int epicId = Integer.valueOf(array[5]);
-            return new Subtask(id, name, status, description, epicId);
+            LocalDateTime startTime = LocalDateTime.parse(array[5]);
+            Long durationInMinutes = Long.valueOf(array[6]);
+            Duration duration = Duration.ofMinutes(durationInMinutes);
+            int epicId = Integer.valueOf(array[7]);
+            return new Subtask(id, name, status, description, startTime, duration, epicId);
         } else if (type.equals(TaskType.TASK)) {
-            return new Task(id, name, status, description);
+            LocalDateTime startTime = LocalDateTime.parse(array[5]);
+            Long durationInMinutes = Long.valueOf(array[6]);
+            Duration duration = Duration.ofMinutes(durationInMinutes);
+            return new Task(id, name, status, description, startTime, duration);
         } else {
             return new Epic(id, name, status, description);
         }
