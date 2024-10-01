@@ -9,6 +9,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -36,7 +38,9 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldAddTask() {
-        Task task = new Task(234,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(234,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
         manager.addTask(task);
         final int taskId = task.getId();
 
@@ -62,8 +66,10 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldAddSubtask() {
         Epic epic = new Epic(1,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
-                "Выбрать в магазине шпатель и купить", 1);
+        Subtask subtask = new Subtask(9, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30,00),
+                Duration.ofMinutes(45),1);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -77,13 +83,16 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldUpdateTask() {
-        Task task = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
 
         manager.addTask(task);
         int taskId = task.getId();
 
-        Task taskForUpdating = new Task(taskId,"Уборка в доме",
-                "Протереть пыль",  TaskStatus.DONE);
+        Task taskForUpdating = new Task(taskId,"Готовка",  TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
         manager.updateTask(taskForUpdating);
 
         assertEquals(taskForUpdating, manager.getTaskById(taskId), "Задача не обновилась.");
@@ -105,8 +114,10 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldUpdateSubtask() {
         Epic epic = new Epic(53,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
-                "Выбрать в магазине шпатель и купить", 53);
+        Subtask subtask = new Subtask(9, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30,00),
+                Duration.ofMinutes(45),53);
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -120,7 +131,9 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetTaskById() {
-        Task task = new Task(5222,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(1443,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
 
         manager.addTask(task);
         int taskId = task.getId();
@@ -143,8 +156,11 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldGetSubtaskById() {
         Epic epic = new Epic(5214,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
-                "Выбрать в магазине шпатель и купить", 5214);
+        Subtask subtask = new Subtask(9, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30,00),
+                Duration.ofMinutes(45),5214);
+
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -157,7 +173,9 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetTasks() {
-        Task task = new Task(3,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(1443,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
 
         manager.addTask(task);
 
@@ -184,8 +202,11 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldGetSubtasks() {
         Epic epic = new Epic(51,"Поехать в отпуск", "Организовать путишествие");
-        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
-                "Выбрать в магазине шпатель и купить", 51);
+        Subtask subtask = new Subtask(9, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30,00),
+                Duration.ofMinutes(45),51);
+
 
         manager.addEpic(epic);
         manager.addSubtask(subtask);
@@ -203,8 +224,11 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10,"Купить шпатель",  TaskStatus.NEW,
-                "Выбрать в магазине шпатель и купить", epicId);
+        Subtask subtask = new Subtask(9, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30,00),
+                Duration.ofMinutes(45),epicId);
+
         manager.addSubtask(subtask);
 
         ArrayList<Subtask> subtasks = new ArrayList<>();
@@ -218,7 +242,9 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveTaskById() {
-        Task task = new Task(6,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
 
         manager.addTask(task);
         int taskId = task.getId();
@@ -245,8 +271,10 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10, "Выбрать курорт",  TaskStatus.NEW,
-                "Изучить варинты гостиниц и забронировать", epicId);
+        Subtask subtask = new Subtask(8,"Выбрать курорт", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 14, 30,00),
+                Duration.ofMinutes(45),epicId);
 
         manager.addSubtask(subtask);
         int subtaskId = subtask.getId();
@@ -257,7 +285,9 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldRemoveTasks() {
-        Task task = new Task(36,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(2,"Готовка",  TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
 
         manager.addTask(task);
         assertEquals(task, manager.getTasks().get(0));
@@ -273,8 +303,10 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10,"Выбрать курорт",  TaskStatus.NEW,
-                "Изучить варинты гостиниц и забронировать", epicId);
+        Subtask subtask = new Subtask(8,"Выбрать курорт", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 14, 30,00),
+                Duration.ofMinutes(45),epicId);
 
         manager.addSubtask(subtask);
 
@@ -293,8 +325,10 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask = new Subtask(10,"Выбрать курорт",  TaskStatus.NEW,
-                "Изучить варинты гостиниц и забронировать", epicId);
+        Subtask subtask = new Subtask(8,"Выбрать курорт", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 14, 30,00),
+                Duration.ofMinutes(45),epicId);
         int subtaskId = subtask.getId();
 
         manager.addSubtask(subtask);
@@ -315,10 +349,14 @@ class InMemoryTaskManagerTests {
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask1 = new Subtask(10,"Выбрать курорт",  TaskStatus.NEW,
-                "Изучить варинты гостиниц и забронировать", epicId);
-        Subtask subtask2 = new Subtask(11,"Загазать билеты",  TaskStatus.DONE,
-                "Выбрать самые выгодные билеты", epicId);
+        Subtask subtask1 = new Subtask(10, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30,00),
+                Duration.ofMinutes(45), epicId);
+        Subtask subtask2 = new Subtask(11, "Заказать билеты", TaskStatus.NEW,
+                "Выбрать лучшуу цену билетов и заказать",
+                LocalDateTime.of(2024, 10,2, 15, 30,00),
+                Duration.ofMinutes(45),epicId);
 
         manager.addSubtask(subtask1);
         assertEquals(epic.getTaskStatus(), subtask1.getTaskStatus(), "Некорректный статус эпика.");
@@ -333,14 +371,18 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldGetHistoryFromHistoryManager() {
-        Task task = new Task(3633,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(3633,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30),
+                Duration.ofMinutes(45));
         manager.addTask(task);
         int taskId = task.getId();
         Epic epic = new Epic(33,"Поехать в отпуск", "Организовать путишествие");
         manager.addEpic(epic);
         int epicId = epic.getId();
-        Subtask subtask = new Subtask(10,"Выбрать курорт", TaskStatus.NEW,
-                "Изучить варинты гостиниц и забронировать", epicId);
+        Subtask subtask = new Subtask(10, "Выбрать курорт", TaskStatus.DONE,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 15, 30),
+                Duration.ofMinutes(45),epicId);
         manager.addSubtask(subtask);
         int subtaskId = subtask.getId();
 
@@ -356,7 +398,9 @@ class InMemoryTaskManagerTests {
     }
     @Test
     void immutabilityOfTheTask() {
-        Task task = new Task(25,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
+        Task task = new Task(25,"Готовка",  TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
         manager.addTask(task);
         int taskId = task.getId();
 
@@ -371,8 +415,12 @@ class InMemoryTaskManagerTests {
 
     @Test
     void shouldSavePreviousVersionOfTask() {
-        Task task = new Task(1,"Уборка", "Собрать и вынести мусор",  TaskStatus.NEW);
-        Task updateTask = new Task(1,"Готовка", "Приготовить еду",  TaskStatus.NEW);
+        Task task = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
+        Task updateTask = new Task(1,"Готовка",  TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
 
         manager.addTask(task);
         manager.getTaskById(task.getId());
@@ -410,16 +458,22 @@ class InMemoryTaskManagerTests {
         Epic epic = new Epic(1,"Поехать в отпуск", "Организовать путешествие");
         manager.addEpic(epic);
 
-        Subtask subtask1 = new Subtask(2, "Купить шпатель",  TaskStatus.NEW,
-                "Выбрать в магазине шпатель и купить",1);
+        Subtask subtask1 = new Subtask(2, "Купить шпатель", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",
+                LocalDateTime.of(2024, 10,1, 12, 30,00),
+                Duration.ofMinutes(45),1);
         manager.addSubtask(subtask1);
 
         Subtask subtask2 = new Subtask(3, "Купить краску", TaskStatus.DONE,
-                "Выбрать краску и купить", 1);
+                "Выбрать краску и купить",
+                LocalDateTime.of(2024, 10,1, 13, 30,00),
+                Duration.ofMinutes(45),1);
         manager.addSubtask(subtask2);
 
-        Subtask subtask3 = new Subtask(4, "Выбрать курорт",  TaskStatus.IN_PROGRESS,
-                "Изучить варинты гостиниц и забронировать", 1);
+        Subtask subtask3 = new Subtask(4,"Выбрать курорт", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,1, 14, 30,00),
+                Duration.ofMinutes(45),1);
         manager.addSubtask(subtask3);
 
         ArrayList<Integer> subtasksIds = manager.getEpicById(1).getSubtasksIds();

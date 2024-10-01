@@ -37,6 +37,16 @@ public class Task {
         this.duration = duration;
     }
 
+    public Task(String nameOfTask, TaskStatus taskStatus, String description, LocalDateTime startTime,
+                Duration duration) {
+        this.taskType = taskType.TASK;
+        this.nameOfTask = nameOfTask;
+        this.taskStatus = taskStatus;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public Task(int id, String nameOfTask, TaskStatus taskStatus, String description) {
         this.id = id;
         this.taskType = taskType.TASK;
