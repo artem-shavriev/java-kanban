@@ -12,8 +12,6 @@ public class Task {
     protected TaskType taskType;
     private Duration duration;
     private LocalDateTime startTime;
-    private LocalDateTime endTime;
-
 
     public Task(int id, String nameOfTask, String description, TaskStatus taskStatus) {
         this.id = id;
@@ -103,8 +101,6 @@ public class Task {
     public LocalDateTime getEndTime() {
         return startTime.plus(duration);
     }
-
-
 
     @Override
     public boolean equals(Object o) {

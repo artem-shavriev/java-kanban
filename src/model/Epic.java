@@ -1,9 +1,11 @@
 package model;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public class Epic extends Task {
     private ArrayList<Integer> subtasksIds = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(int id, String nameOfTask, TaskStatus taskStatus, String description) {
         super(id, nameOfTask, taskStatus, description);
@@ -47,5 +49,9 @@ public class Epic extends Task {
         } else {
             System.out.println("Такого id нет в списке subtasksIds");
         }
+    }
+
+    public void setEpicEndTime (LocalDateTime endTime) {
+        this.endTime = endTime;
     }
 }

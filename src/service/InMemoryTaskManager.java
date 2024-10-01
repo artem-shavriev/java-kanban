@@ -307,16 +307,21 @@ public class InMemoryTaskManager implements TaskManager {
 
     private void updateEpicStartTime(Epic epic) {
         if (epic != null) {
-            ArrayList<Subtask> subtasksOfEpic = getSubtasksOfEpic(epic.getId());
-            LocalDateTime epicStartTime = subtasksOfEpic.get(0).getStartTime();
-            ;
+            LocalDateTime epicStartTime;
 
-            for (int i = 1; i < subtasksOfEpic.size(); i++) {
-                if (subtasksOfEpic.get(i).getStartTime().isBefore(epicStartTime)) {
-                    epicStartTime = subtasksOfEpic.get(i).getStartTime();
+            if (subtasks.isEmpty()) {
+                epicStartTime = null;
+            } else {
+                ArrayList<Subtask> subtasksOfEpic = getSubtasksOfEpic(epic.getId());
+                epicStartTime = subtasksOfEpic.get(0).getStartTime();
+
+                for (int i = 1; i < subtasksOfEpic.size(); i++) {
+                    if (subtasksOfEpic.get(i).getStartTime().isBefore(epicStartTime)) {
+                        epicStartTime = subtasksOfEpic.get(i).getStartTime();
+                    }
                 }
+                epic.setStartTime(epicStartTime);
             }
-            epic.setStartTime(epicStartTime);
         }
     }
 
@@ -334,6 +339,26 @@ public class InMemoryTaskManager implements TaskManager {
                     epicDuration = epicDuration.plus(subtasksOfEpic.get(i).getDuration());
                 }
                 epic.setDuration(epicDuration);
+            }
+        }
+    }
+
+    private void updateEpicEndTime(Epic epic) {
+        if (epic != null) {
+            LocalDateTime epicEndTime;
+
+            if (subtasks.isEmpty()) {
+                epicEndTime = null;
+            } else {
+                ArrayList<Subtask> subtasksOfEpic = getSubtasksOfEpic(epic.getId());
+                epicEndTime = subtasksOfEpic.get(0).getEndTime();
+
+                for (int i = 1; i < subtasksOfEpic.size(); i++) {
+                    if (subtasksOfEpic.get(i).getEndTime().isAfter(epicEndTime)) {
+                        epicEndTime = subtasksOfEpic.get(i).getEndTime();
+                    }
+                }
+                epic.setEpicEndTime(epicEndTime);
             }
         }
     }
