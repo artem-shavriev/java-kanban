@@ -5,6 +5,8 @@ import model.Subtask;
 import model.Task;
 import model.TaskStatus;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.HashMap;
@@ -27,7 +29,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task addTask(Task task) {
-        int  id;
+        int id;
         if (task.getId() == null) {
             id = generateNewId();
             task.setId(id);
@@ -271,7 +273,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public  List<Task> getHistory() {
+    public List<Task> getHistory() {
         return historyManager.getHistory();
     }
 
@@ -299,6 +301,39 @@ public class InMemoryTaskManager implements TaskManager {
                 } else {
                     epic.setTaskStatus(TaskStatus.IN_PROGRESS);
                 }
+            }
+        }
+    }
+
+    private void updateEpicStartTime(Epic epic) {
+        if (epic != null) {
+            ArrayList<Subtask> subtasksOfEpic = getSubtasksOfEpic(epic.getId());
+            LocalDateTime epicStartTime = subtasksOfEpic.get(0).getStartTime();
+            ;
+
+            for (int i = 1; i < subtasksOfEpic.size(); i++) {
+                if (subtasksOfEpic.get(i).getStartTime().isBefore(epicStartTime)) {
+                    epicStartTime = subtasksOfEpic.get(i).getStartTime();
+                }
+            }
+            epic.setStartTime(epicStartTime);
+        }
+    }
+
+    private void updateEpicDuration(Epic epic) {
+        if (epic != null) {
+            Duration epicDuration;
+
+            if (subtasks.isEmpty()) {
+                epicDuration = null;
+            } else {
+                ArrayList<Subtask> subtasksOfEpic = getSubtasksOfEpic(epic.getId());
+                epicDuration = subtasksOfEpic.get(0).getDuration();
+
+                for (int i = 1; i < subtasksOfEpic.size(); i++) {
+                    epicDuration = epicDuration.plus(subtasksOfEpic.get(i).getDuration());
+                }
+                epic.setDuration(epicDuration);
             }
         }
     }
