@@ -345,11 +345,10 @@ class InMemoryTaskManagerTests {
     @Test
     void shouldUpdateEpicStatus() {
         Epic epic = new Epic(363,"Поехать в отпуск", "Организовать путишествие");
-
         manager.addEpic(epic);
         int epicId = epic.getId();
 
-        Subtask subtask1 = new Subtask(10, "Выбрать курорт", TaskStatus.DONE,
+        Subtask subtask1 = new Subtask(10, "Выбрать курорт", TaskStatus.NEW,
                 "Изучить варинты гостиниц и забронировать",
                 LocalDateTime.of(2024, 10,1, 15, 30,00),
                 Duration.ofMinutes(45), epicId);
@@ -357,16 +356,33 @@ class InMemoryTaskManagerTests {
                 "Выбрать лучшуу цену билетов и заказать",
                 LocalDateTime.of(2024, 10,2, 15, 30,00),
                 Duration.ofMinutes(45),epicId);
+        Subtask subtask3 = new Subtask(3, "Заказать билеты", TaskStatus.DONE,
+                "Выбрать лучшуу цену билетов и заказать",
+                LocalDateTime.of(2024, 10,3, 15, 30,00),
+                Duration.ofMinutes(45),epicId);
+        Subtask subtask4 = new Subtask(4, "Заказать билеты", TaskStatus.DONE,
+                "Выбрать лучшуу цену билетов и заказать",
+                LocalDateTime.of(2024, 10,4, 15, 30,00),
+                Duration.ofMinutes(45),epicId);
 
         manager.addSubtask(subtask1);
-        assertEquals(epic.getTaskStatus(), subtask1.getTaskStatus(), "Некорректный статус эпика.");
-
         manager.addSubtask(subtask2);
+        assertEquals(epic.getTaskStatus(), TaskStatus.NEW, "Некорректный статус эпика.");
+
+        manager.removeSubtaskById(subtask1.getId());
+        manager.removeSubtaskById(subtask2.getId());
+        manager.addSubtask(subtask3);
+        manager.addSubtask(subtask4);
+        assertEquals(epic.getTaskStatus(), TaskStatus.DONE, "Некорректный статус эпика.");
+
+        subtask3.setTaskStatus(TaskStatus.NEW);
+        manager.updateSubtask(subtask3);
         assertEquals(epic.getTaskStatus(), TaskStatus.IN_PROGRESS, "Некорректный статус эпика.");
 
-        int subtask1Id = subtask1.getId();
-        manager.removeSubtaskById(subtask1Id);
-        assertEquals(epic.getTaskStatus(), subtask2.getTaskStatus(), "Некорректный статус эпика.");
+        subtask3.setTaskStatus(TaskStatus.IN_PROGRESS);
+        subtask4.setTaskStatus(TaskStatus.IN_PROGRESS);
+        assertEquals(epic.getTaskStatus(), TaskStatus.IN_PROGRESS, "Некорректный статус эпика.");
+
     }
 
     @Test
