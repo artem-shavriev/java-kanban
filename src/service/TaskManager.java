@@ -53,4 +53,6 @@ public interface TaskManager {
     void setGenerateId(int id);
 
     ArrayList<Task> getPrioritizedTask();
+
+    boolean checkIntersectionTasks(Task task);
 }

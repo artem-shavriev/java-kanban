@@ -37,18 +37,24 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public Task addTask(Task task) {
-        int id;
-        if (task.getId() == null) {
-            id = generateNewId();
-            task.setId(id);
+        if (!checkIntersectionTasks(task)) {
+            int id;
+            if (task.getId() == null) {
+                id = generateNewId();
+                task.setId(id);
+            } else {
+                id = task.getId();
+            }
+            tasks.put(id, task);
+            if (task.getStartTime() != null) {
+                sortedByTimeTasks.add(task);
+            }
+            return task;
         } else {
-            id = task.getId();
+            System.out.println("Задача не добавлена. "
+                    + "Есть пересечение по времени выполнения с другими задачами.");
+            return null;
         }
-        tasks.put(id, task);
-        if (task.getStartTime() != null) {
-            sortedByTimeTasks.add(task);
-        }
-        return task;
     }
 
     public Epic addEpic(Epic epic) {
@@ -70,23 +76,29 @@ public class InMemoryTaskManager implements TaskManager {
         Epic epic = epics.get(subtask.getEpicId());
 
         if (subtask != null && subtask.getId() != epic.getId()) {
-            if (subtask.getId() == null) {
-                id = generateNewId();
-                subtask.setId(id);
+            if (!checkIntersectionTasks(subtask)) {
+                if (subtask.getId() == null) {
+                    id = generateNewId();
+                    subtask.setId(id);
+                } else {
+                    id = subtask.getId();
+                }
+                subtask.setEpicId(epic.getId());
+                subtasks.put(id, subtask);
+                epic.setSubtaskId(id);
+                updateEpicStatus(epics.get(subtask.getEpicId()));
+                updateEpicStartTime(epic);
+                updateEpicDuration(epic);
+                updateEpicEndTime(epic);
+                if (subtask.getStartTime() != null) {
+                    sortedByTimeTasks.add(subtask);
+                }
+                return subtask;
             } else {
-                id = subtask.getId();
+                System.out.println("Подзадача не добавлена. "
+                        + "Есть пересечение по времени выполнения с другими задачами.");
+                return null;
             }
-            subtask.setEpicId(epic.getId());
-            subtasks.put(id, subtask);
-            epic.setSubtaskId(id);
-            updateEpicStatus(epics.get(subtask.getEpicId()));
-            updateEpicStartTime(epic);
-            updateEpicDuration(epic);
-            updateEpicEndTime(epic);
-            if (subtask.getStartTime() != null) {
-                sortedByTimeTasks.add(subtask);
-            }
-            return subtask;
         } else {
             System.out.println("id подзадачи не может совпадать с id ее эпика, подзадача не добавлена.");
             return null;
@@ -96,15 +108,21 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Task updateTask(Task task) {
         if (task != null) {
-            int id = task.getId();
-            if (tasks.containsKey(id)) {
-                tasks.put(id, task);
-                if (task.getStartTime() != null) {
-                    sortedByTimeTasks.add(task);
+            if (!checkIntersectionTasks(task)) {
+                int id = task.getId();
+                if (tasks.containsKey(id)) {
+                    tasks.put(id, task);
+                    if (task.getStartTime() != null) {
+                        sortedByTimeTasks.add(task);
+                    }
+                    return task;
+                } else {
+                    System.out.println("Задачи с данным id не существует");
+                    return null;
                 }
-                return task;
             } else {
-                System.out.println("Задачи с данным id не существует");
+                System.out.println("Задача не обновлена. "
+                        + "Есть пересечение по времени выполнения с другими задачами.");
                 return null;
             }
         } else {
@@ -137,24 +155,30 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public Subtask updateSubtask(Subtask subtask) {
         if (subtask != null) {
-            int id = subtask.getId();
-            if (subtasks.containsKey(id)) {
-                if (subtasks.get(id).getEpicId() == subtask.getEpicId()) {
-                    subtasks.put(subtask.getId(), subtask);
-                    if (subtask.getStartTime() != null) {
-                        sortedByTimeTasks.add(subtask);
+            if (!checkIntersectionTasks(subtask)) {
+                int id = subtask.getId();
+                if (subtasks.containsKey(id)) {
+                    if (subtasks.get(id).getEpicId() == subtask.getEpicId()) {
+                        subtasks.put(subtask.getId(), subtask);
+                        if (subtask.getStartTime() != null) {
+                            sortedByTimeTasks.add(subtask);
+                        }
+                        updateEpicStatus(epics.get(subtask.getEpicId()));
+                        updateEpicStartTime(epics.get(subtask.getEpicId()));
+                        updateEpicDuration(epics.get(subtask.getEpicId()));
+                        updateEpicEndTime(epics.get(subtask.getEpicId()));
+                        return subtask;
+                    } else {
+                        System.out.println("У подзадачи не корректный эпик.");
+                        return null;
                     }
-                    updateEpicStatus(epics.get(subtask.getEpicId()));
-                    updateEpicStartTime(epics.get(subtask.getEpicId()));
-                    updateEpicDuration(epics.get(subtask.getEpicId()));
-                    updateEpicEndTime(epics.get(subtask.getEpicId()));
-                    return subtask;
                 } else {
-                    System.out.println("У подзадачи не корректный эпик.");
+                    System.out.println("Подзадачи с данным id не существует");
                     return null;
                 }
             } else {
-                System.out.println("Подзадачи с данным id не существует");
+                System.out.println("Подзадача не обновлена. "
+                        + "Есть пересечение по времени выполнения с другими задачами.");
                 return null;
             }
         } else {
@@ -405,5 +429,27 @@ public class InMemoryTaskManager implements TaskManager {
         ArrayList<Task> list = new ArrayList<>();
         list.addAll(sortedByTimeTasks);
         return list;
+    }
+
+    @Override
+    public boolean checkIntersectionTasks(Task task) {
+        ArrayList<Task> prioritizedTask = getPrioritizedTask();
+        boolean iskIntersection = false;
+        for (int i = 0; i < prioritizedTask.size(); i++) {
+            if (task.getStartTime().isAfter(prioritizedTask.get(i).getStartTime())
+                    && task.getEndTime().isBefore(prioritizedTask.get(i).getEndTime())) {
+                iskIntersection = true;
+            } else if (task.getStartTime().isBefore(prioritizedTask.get(i).getStartTime())
+                    && task.getEndTime().isAfter(prioritizedTask.get(i).getStartTime())) {
+                iskIntersection = true;
+            } else if (task.getStartTime().isAfter(prioritizedTask.get(i).getStartTime())
+                    && task.getStartTime().isBefore(prioritizedTask.get(i).getEndTime())) {
+                iskIntersection = true;
+            } else if (task.getStartTime().isBefore(prioritizedTask.get(i).getStartTime())
+                    && task.getEndTime().isAfter(prioritizedTask.get(i).getEndTime())) {
+                iskIntersection = true;
+            }
+        }
+        return iskIntersection;
     }
 }

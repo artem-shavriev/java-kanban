@@ -535,5 +535,38 @@ class InMemoryTaskManagerTests {
         assertEquals(subtask3, manager.getPrioritizedTask().get(4), "Сортировка неудалась.");
     }
 
+    @Test
+    void shouldNotIntersection() {
+        Task task = new Task(1, "Уборка 2.10.2024 12:30", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10, 2, 12, 30),
+                Duration.ofMinutes(45));
+        Task task2 = new Task(2, "Готовка 2.10.2024 11:30", TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10, 2 , 11, 30),
+                Duration.ofMinutes(120));
+        Epic epic = new Epic(5,"Поехать в отпуск", "Организовать путешествие");
+        Subtask subtask1 = new Subtask(6, "Купить шпатель 2.10.2024 12:30", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",
+                LocalDateTime.of(2024, 10,2, 10, 30),
+                Duration.ofMinutes(180),5);
+        Subtask subtask2 = new Subtask(7, "Купить краску 10.10.2024 13:30", TaskStatus.DONE,
+                "Выбрать краску и купить",
+                LocalDateTime.of(2024, 10,10, 13, 30),
+                Duration.ofMinutes(45),5);
+        Subtask subtask3 = new Subtask(8,"Выбрать курорт 10.10.2024 13:20", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,10, 13, 35),
+                Duration.ofMinutes(5),5);
+
+        manager.addTask(task);
+        manager.addTask(task2);
+        manager.addEpic(epic);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+
+        assertEquals(task, manager.getPrioritizedTask().get(0));
+        assertEquals(subtask2, manager.getPrioritizedTask().get(1));
+    }
+
 
 }
