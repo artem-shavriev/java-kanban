@@ -568,5 +568,61 @@ class InMemoryTaskManagerTests {
         assertEquals(subtask2, manager.getPrioritizedTask().get(1));
     }
 
+    @Test
+    void shouldUpdateEpicStartAndEndTime() {
+        Epic epic = new Epic(5,"Поехать в отпуск", "Организовать путешествие");
+        Subtask subtask1 = new Subtask(6, "Купить шпатель 2.10.2024 10:30", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",
+                LocalDateTime.of(2024, 10,2, 10, 30),
+                Duration.ofMinutes(30),5);
+        Subtask subtask2 = new Subtask(7, "Купить краску 3.10.2024 13:30", TaskStatus.DONE,
+                "Выбрать краску и купить",
+                LocalDateTime.of(2024, 10,2, 13, 30),
+                Duration.ofMinutes(30),5);
+        Subtask subtask3 = new Subtask(8,"Выбрать курорт 4.10.2024 13:20", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,2, 16, 30),
+                Duration.ofMinutes(30),5);
 
+        manager.addEpic(epic);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+
+        assertEquals(epic.getStartTime(), LocalDateTime.of(2024, 10,2, 10, 30),
+                "Врема начала эпика не установлено.");
+        assertEquals(epic.getEndTime(), subtask3.getEndTime(),
+                "Врема конца эпика не установлено.");
+    }
+
+    @Test
+    void shouldUpdateEpicDuration() {
+        Epic epic = new Epic(5,"Поехать в отпуск", "Организовать путешествие");
+        Subtask subtask1 = new Subtask(6, "Купить шпатель 2.10.2024 10:30", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",
+                LocalDateTime.of(2024, 10,2, 10, 30),
+                Duration.ofMinutes(30),5);
+        Subtask subtask2 = new Subtask(7, "Купить краску 3.10.2024 13:30", TaskStatus.DONE,
+                "Выбрать краску и купить",
+                LocalDateTime.of(2024, 10,2, 13, 30),
+                Duration.ofMinutes(30),5);
+        Subtask subtask3 = new Subtask(8,"Выбрать курорт 4.10.2024 13:20", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,2, 16, 30),
+                Duration.ofMinutes(30),5);
+
+        manager.addEpic(epic);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+
+        Duration durationOfAllTasks = subtask1.getDuration().plus(subtask2.getDuration().plus(subtask3.getDuration()));
+
+        assertEquals(epic.getDuration(), durationOfAllTasks, "Продолжительность эпика не обновилась.");
+
+        manager.removeSubtaskById(8);
+        manager.removeSubtaskById(7);
+
+        assertEquals(epic.getDuration(), subtask1.getDuration(), "Продолжительность эпика не обновилась.");
+    }
 }

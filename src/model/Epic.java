@@ -17,11 +17,6 @@ public class Epic extends Task {
         this.taskType = taskType.EPIC;
     }
 
-    public Epic(String nameOfTask, String description) {
-        super(nameOfTask, description);
-        this.taskType = taskType.EPIC;
-    }
-
     @Override
     public TaskType getTaskType() {
         return taskType.EPIC;
@@ -53,5 +48,10 @@ public class Epic extends Task {
 
     public void setEpicEndTime (LocalDateTime endTime) {
         this.endTime = endTime;
+    }
+
+    @Override
+    public LocalDateTime getEndTime() {
+        return endTime;
     }
 }
