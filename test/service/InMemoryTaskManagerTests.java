@@ -488,4 +488,52 @@ class InMemoryTaskManagerTests {
         assertFalse(subtasksIds.contains(2), "Id подзадач не удалились");
         assertFalse(subtasksIds.contains(4), "Id подзадач не удалились");
     }
+
+    @Test
+    void shouldSortTasksByTime() {
+        Task task = new Task(1, "Уборка 2.10.2024 12:30", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10, 2, 12, 30, 00),
+                Duration.ofMinutes(45));
+        Task task2 = new Task(2, "Готовка 2.10.2024 11:30", TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10, 2 , 11, 30, 00),
+                Duration.ofMinutes(45));
+        Task task3 = new Task(3, "Готовка 3.10.2024 11:30", TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10, 3 , 11, 30, 00),
+                Duration.ofMinutes(45));
+        Task task4 = new Task(4, "Уборка 3.10.2024 12:30", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10, 3, 12, 30, 00),
+                Duration.ofMinutes(45));
+        Epic epic = new Epic(5,"Поехать в отпуск", "Организовать путешествие");
+        Subtask subtask1 = new Subtask(6, "Купить шпатель 11.10.2024 12:30", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",
+                LocalDateTime.of(2024, 10,11, 12, 30,00),
+                Duration.ofMinutes(45),5);
+        Subtask subtask2 = new Subtask(7, "Купить краску 10.10.2024 13:30", TaskStatus.DONE,
+                "Выбрать краску и купить",
+                LocalDateTime.of(2024, 10,10, 13, 30,00),
+                Duration.ofMinutes(45),5);
+        Subtask subtask3 = new Subtask(8,"Выбрать курорт 9.10.2024 14:30", TaskStatus.IN_PROGRESS,
+                "Изучить варинты гостиниц и забронировать",
+                LocalDateTime.of(2024, 10,9, 14, 30,00),
+                Duration.ofMinutes(45),5);
+
+        manager.addTask(task);
+        manager.addTask(task2);
+        manager.addTask(task3);
+        manager.addTask(task4);
+        manager.addEpic(epic);
+        manager.addSubtask(subtask1);
+        manager.addSubtask(subtask2);
+        manager.addSubtask(subtask3);
+
+        assertEquals(task, manager.getPrioritizedTask().get(1), "Сортировка неудалась.");
+        assertEquals(task2, manager.getPrioritizedTask().get(0), "Сортировка неудалась.");
+        assertEquals(task3, manager.getPrioritizedTask().get(2), "Сортировка неудалась.");
+        assertEquals(task4, manager.getPrioritizedTask().get(3), "Сортировка неудалась.");
+        assertEquals(subtask1, manager.getPrioritizedTask().get(6), "Сортировка неудалась.");
+        assertEquals(subtask2, manager.getPrioritizedTask().get(5), "Сортировка неудалась.");
+        assertEquals(subtask3, manager.getPrioritizedTask().get(4), "Сортировка неудалась.");
+    }
+
+
 }
