@@ -19,7 +19,7 @@ public class TaskConvertor {
             taskToString = String.format("%s,%s,%s,%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
                     task.getNameOfTask(), task.getTaskStatus(), task.getDescription(),
                     subtask.getStartTime(), subtask.getDuration().toMinutes(), subtask.getEpicId());
-        } else if (task.getTaskType().equals(TaskType.EPIC)){
+        } else if (task.getTaskType().equals(TaskType.EPIC)) {
             taskToString = String.format("%s,%s,%s,%s,%s", task.getId(), task.getTaskType(),
                     task.getNameOfTask(), task.getTaskStatus(), task.getDescription());
         } else {
