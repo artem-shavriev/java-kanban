@@ -14,14 +14,13 @@ import org.junit.jupiter.api.Test;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class FileBackedTaskManagerTests {
+public class FileBackedTaskManagerTests extends TaskManagerTest {
     FileBackedTaskManager fileBackedTaskManager;
     File backedFile;
 
@@ -261,8 +260,8 @@ public class FileBackedTaskManagerTests {
         }, "Неверный путь к файлу должен приводить к исключению");
 
         assertThrows(RuntimeException.class, () -> {
-            newManager.loadFromFile(file);
-        }, "Неверный путь к файлу должен приводить к исключению"
+                    newManager.loadFromFile(file);
+                }, "Неверный путь к файлу должен приводить к исключению"
         );
     }
 }
