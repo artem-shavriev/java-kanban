@@ -51,8 +51,6 @@ public class InMemoryTaskManager implements TaskManager {
             }
             return task;
         } else {
-            System.out.println("Задача не добавлена. "
-                    + "Есть пересечение по времени выполнения с другими задачами.");
             return null;
         }
     }
@@ -95,12 +93,9 @@ public class InMemoryTaskManager implements TaskManager {
                 }
                 return subtask;
             } else {
-                System.out.println("Подзадача не добавлена. "
-                        + "Есть пересечение по времени выполнения с другими задачами.");
                 return null;
             }
         } else {
-            System.out.println("id подзадачи не может совпадать с id ее эпика, подзадача не добавлена.");
             return null;
         }
     }
@@ -117,12 +112,9 @@ public class InMemoryTaskManager implements TaskManager {
                     }
                     return task;
                 } else {
-                    System.out.println("Задачи с данным id не существует");
                     return null;
                 }
             } else {
-                System.out.println("Задача не обновлена. "
-                        + "Есть пересечение по времени выполнения с другими задачами.");
                 return null;
             }
         } else {
@@ -144,7 +136,6 @@ public class InMemoryTaskManager implements TaskManager {
                 updateEpicEndTime(epic);
                 return epic;
             } else {
-                System.out.println("Эпика с данным id не существует");
                 return null;
             }
         } else {
@@ -169,16 +160,12 @@ public class InMemoryTaskManager implements TaskManager {
                         updateEpicEndTime(epics.get(subtask.getEpicId()));
                         return subtask;
                     } else {
-                        System.out.println("У подзадачи не корректный эпик.");
                         return null;
                     }
                 } else {
-                    System.out.println("Подзадачи с данным id не существует");
                     return null;
                 }
             } else {
-                System.out.println("Подзадача не обновлена. "
-                        + "Есть пересечение по времени выполнения с другими задачами.");
                 return null;
             }
         } else {
@@ -192,9 +179,8 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(tasks.get(id));
             return tasks.get(id);
         } else {
-            System.out.println("Задачи с данным id не существует");
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -203,9 +189,8 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(epics.get(id));
             return epics.get(id);
         } else {
-            System.out.println("Эпика с данным id не существует");
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -214,9 +199,8 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.add(subtasks.get(id));
             return subtasks.get(id);
         } else {
-            System.out.println("Подзадачи с данным id не существует");
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -244,9 +228,8 @@ public class InMemoryTaskManager implements TaskManager {
                     .forEach(id -> epicSubtasks.add(subtasks.get(id)));
             return epicSubtasks;
         } else {
-            System.out.println("Эпика с данным id не существует");
+            return null;
         }
-        return null;
     }
 
     @Override
@@ -256,8 +239,6 @@ public class InMemoryTaskManager implements TaskManager {
             tasks.remove(id);
             historyManager.remove(id);
             sortedByTimeTasks.remove(task);
-        } else {
-            System.out.println("Задачи с данным id не существует");
         }
     }
 
@@ -276,9 +257,6 @@ public class InMemoryTaskManager implements TaskManager {
             updateEpicStartTime(epicOfSubtask);
             updateEpicDuration(epicOfSubtask);
             updateEpicEndTime(epicOfSubtask);
-
-        } else {
-            System.out.println("Подзадачи с данным id не существует");
         }
     }
 
@@ -295,8 +273,6 @@ public class InMemoryTaskManager implements TaskManager {
                     });
             epics.remove(id);
             historyManager.remove(id);
-        } else {
-            System.out.println("Эпика с данным id не существует");
         }
     }
 
