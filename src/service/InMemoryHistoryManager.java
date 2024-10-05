@@ -54,7 +54,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                     node.next.prev = node.prev;
                 }
             }
-
             node.data = null;
             historyList.size--;
         }
@@ -92,5 +91,17 @@ public class InMemoryHistoryManager implements HistoryManager {
         Node nodeForRemove = historyHashMap.get(id);
         removeNode(nodeForRemove);
         historyHashMap.remove(id);
+    }
+}
+
+class Node<T> {
+    public T data;
+    public service.Node<T> next;
+    public service.Node<T> prev;
+
+    public Node(service.Node<T> prev, T data, service.Node<T> next) {
+        this.data = data;
+        this.next = next;
+        this.prev = prev;
     }
 }
