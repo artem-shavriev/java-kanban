@@ -85,9 +85,7 @@ public class InMemoryTaskManager implements TaskManager {
                 subtasks.put(id, subtask);
                 epic.setSubtaskId(id);
                 updateEpicStatus(epics.get(subtask.getEpicId()));
-                updateEpicStartTime(epic);
-                updateEpicDuration(epic);
-                updateEpicEndTime(epic);
+                updateEpicTime(epic);
                 if (subtask.getStartTime() != null) {
                     sortedByTimeTasks.add(subtask);
                 }
@@ -131,9 +129,7 @@ public class InMemoryTaskManager implements TaskManager {
                 epics.put(id, epic);
                 epic.setSubtasksIds(subtasksIds);
                 updateEpicStatus(epic);
-                updateEpicStartTime(epic);
-                updateEpicDuration(epic);
-                updateEpicEndTime(epic);
+                updateEpicTime(epic);
                 return epic;
             } else {
                 return null;
@@ -155,9 +151,7 @@ public class InMemoryTaskManager implements TaskManager {
                             sortedByTimeTasks.add(subtask);
                         }
                         updateEpicStatus(epics.get(subtask.getEpicId()));
-                        updateEpicStartTime(epics.get(subtask.getEpicId()));
-                        updateEpicDuration(epics.get(subtask.getEpicId()));
-                        updateEpicEndTime(epics.get(subtask.getEpicId()));
+                        updateEpicTime(epics.get(subtask.getEpicId()));
                         return subtask;
                     } else {
                         return null;
@@ -254,9 +248,7 @@ public class InMemoryTaskManager implements TaskManager {
             sortedByTimeTasks.remove(subtask);
             epicOfSubtask.removeSubtaskIdById(id);
             updateEpicStatus(epicOfSubtask);
-            updateEpicStartTime(epicOfSubtask);
-            updateEpicDuration(epicOfSubtask);
-            updateEpicEndTime(epicOfSubtask);
+            updateEpicTime(epicOfSubtask);
         }
     }
 
@@ -312,9 +304,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .forEach(epic -> {
                     epic.setTaskStatus(TaskStatus.NEW);
                     epic.removeAllSubtasksIds();
-                    updateEpicStartTime(epic);
-                    updateEpicDuration(epic);
-                    updateEpicEndTime(epic);
+                    updateEpicTime(epic);
                 });
     }
 
@@ -399,6 +389,14 @@ public class InMemoryTaskManager implements TaskManager {
                 }
                 epic.setEpicEndTime(epicEndTime);
             }
+        }
+    }
+
+    private void updateEpicTime(Epic epic) {
+        if (epic != null) {
+            updateEpicStartTime(epic);
+            updateEpicEndTime(epic);
+            updateEpicDuration(epic);
         }
     }
 
