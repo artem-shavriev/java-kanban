@@ -1,11 +1,11 @@
 package service;
 
-public class Node<T> {
+class Node<T> {
     public T data;
-    public Node<T> next;
-    public Node<T> prev;
+    public service.Node<T> next;
+    public service.Node<T> prev;
 
-    public Node(Node<T> prev, T data, Node<T> next) {
+    public Node(service.Node<T> prev, T data, service.Node<T> next) {
         this.data = data;
         this.next = next;
         this.prev = prev;

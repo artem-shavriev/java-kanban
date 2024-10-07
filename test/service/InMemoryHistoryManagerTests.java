@@ -82,7 +82,18 @@ public class InMemoryHistoryManagerTests {
         Epic epic = new Epic(2, "Сделать ремонт", "Покрасить стены на балконе");
         historyManager.add(epic);
 
+        Subtask subtask = new Subtask(10, "Купить шпатель",  TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",2);
+        historyManager.add(subtask);
+
+        historyManager.remove(2);
+        assertNotEquals(historyManager.getHistory().get(1), task, "Задача не удалена.");
+
         historyManager.remove(1);
-        assertNotEquals(historyManager.getHistory().get(0), task, "Задача id:1 не удалена");
+        assertNotEquals(historyManager.getHistory().get(0), epic, "Эпик не удален.");
+
+        historyManager.remove(10);
+        assertTrue(historyManager.getHistory().isEmpty(), "Задачи не были удалены из истории.");
+
     }
 }

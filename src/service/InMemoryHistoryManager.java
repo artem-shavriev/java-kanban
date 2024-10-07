@@ -54,7 +54,6 @@ public class InMemoryHistoryManager implements HistoryManager {
                     node.next.prev = node.prev;
                 }
             }
-
             node.data = null;
             historyList.size--;
         }
@@ -94,3 +93,4 @@ public class InMemoryHistoryManager implements HistoryManager {
         historyHashMap.remove(id);
     }
 }
+
