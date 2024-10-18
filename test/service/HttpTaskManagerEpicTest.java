@@ -1,19 +1,16 @@
 package service;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
+import model.Epic;
+import model.Subtask;
 import model.Task;
 import model.TaskStatus;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -27,12 +24,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
-public class HttpTaskManagerTasksTest {
+public class HttpTaskManagerEpicTest {
     TaskManager manager = new InMemoryTaskManager();
     HttpTaskServer taskServer = new HttpTaskServer(manager);
     Gson gson = HttpTaskServer.getGson();
 
-    public HttpTaskManagerTasksTest() throws IOException {
+    public HttpTaskManagerEpicTest() throws IOException {
     }
 
     @BeforeEach
@@ -49,18 +46,20 @@ public class HttpTaskManagerTasksTest {
     }
 
     @Test
-    public void testAddTask() throws IOException, InterruptedException {
-        Task task = new Task(1,"Тест1", TaskStatus.NEW, "Тест1",
-                LocalDateTime.of(2024, 10,3, 12, 30,00),
-                Duration.ofMinutes(45));
+    public void testAddEpic() throws IOException, InterruptedException {
+        Epic epic = new Epic(1,"Эпик 1", "Организовать путешествие");
+        Subtask subtask = new Subtask(6, "Купить шпатель", TaskStatus.NEW,
+                "Выбрать в магазине шпатель и купить",
+                LocalDateTime.of(2024, 10,1, 12, 30,00),
+                Duration.ofMinutes(45),1);
 
-        String taskJson = gson.toJson(task);
+        String epicJson = gson.toJson(epic);
 
         HttpClient client = HttpClient.newHttpClient();
-        URI url = URI.create("http://localhost:8080/tasks");
+        URI url = URI.create("http://localhost:8080/epics");
         HttpRequest request = HttpRequest.newBuilder()
                 .uri(url)
-                .POST(HttpRequest.BodyPublishers.ofString(taskJson))
+                .POST(HttpRequest.BodyPublishers.ofString(epicJson))
                 .version(HttpClient.Version.HTTP_1_1)
                 .build();
 
@@ -68,11 +67,11 @@ public class HttpTaskManagerTasksTest {
 
         assertEquals(201, response.statusCode());
 
-        List<Task> tasksFromManager = manager.getTasks();
+        List<Epic> epicsFromManager = manager.getEpics();
 
-        assertNotNull(tasksFromManager, "Задачи не возвращаются");
-        assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-        assertEquals("Тест1", tasksFromManager.get(0).getNameOfTask(), "Некорректное имя задачи");
+        assertNotNull(epicsFromManager, "Задачи не возвращаются");
+        assertEquals(1, epicsFromManager.size(), "Некорректное количество задач");
+        assertEquals("Эпик 1", epicsFromManager.get(0).getNameOfTask(), "Некорректное имя задачи");
     }
 
     @Test
@@ -136,9 +135,11 @@ public class HttpTaskManagerTasksTest {
 
         assertEquals(200, response.statusCode());
 
+        List<Task> tasksFromManager = manager.getTasks();
+
        // assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
-        assertEquals("Тест1",  tasks.get(0).getNameOfTask(), "Некорректное имя задачи");
-        assertEquals("Тест2",  tasks.get(1).getNameOfTask(), "Некорректное имя задачи");
+        assertEquals("Тест1", tasksFromManager.get(0).getNameOfTask(), "Некорректное имя задачи");
+        assertEquals("Тест2", tasksFromManager.get(1).getNameOfTask(), "Некорректное имя задачи");
     }
 
     @Test
@@ -186,6 +187,6 @@ public class HttpTaskManagerTasksTest {
 
         assertEquals(200, response.statusCode());
 
-        assertNull(manager.getTaskById(1), "Задача не удалена.");
+        assertNull(manager.getTaskById(1), "Задача не не удалена от сервера.");
     }
 }
