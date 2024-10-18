@@ -143,10 +143,6 @@ public class HttpTaskServer {
                 String requestPath = httpExchange.getRequestURI().getPath();
                 String[] splitStrings = requestPath.split("/");
                 Endpoint endpoint = getEndpoint(requestPath, requestMethod);
-                Task task1 = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
-                        LocalDateTime.of(2024, 10,2, 12, 30,00),
-                        Duration.ofMinutes(45));
-                taskManager.addTask(task1);
 
                 switch (endpoint) {
                     case GET:
@@ -177,7 +173,7 @@ public class HttpTaskServer {
                             }
                         }
                         break;
-                    case POST_BY_ID: //задача пересекается сама с собой по времени при обновлении
+                    case POST_BY_ID:
                         String taskForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
                         Task newTaskWithId = gson.fromJson(taskForPostWithId, Task.class);
                         if (taskManager.checkIntersectionTasks(newTaskWithId)) {
@@ -195,7 +191,7 @@ public class HttpTaskServer {
                     case DELETE:
                         int idForDelete = Integer.parseInt(splitStrings[2]);
                         taskManager.removeTaskById(idForDelete);
-                        httpExchange.sendResponseHeaders(201, 0);
+                        httpExchange.sendResponseHeaders(200, 0);
                         httpExchange.close();
                         break;
                 }
