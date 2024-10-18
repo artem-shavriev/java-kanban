@@ -30,4 +30,12 @@ public class BaseHttpHandler {
         exchange.getResponseBody().write(resp);
         exchange.close();
     }
+
+    protected void sendInternalError(HttpExchange exchange) throws IOException {
+        String text = "Ошибка сервера.";
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(500, 0);
+        exchange.getResponseBody().write(resp);
+        exchange.close();
+    }
 }

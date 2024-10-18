@@ -10,7 +10,10 @@ import java.net.http.HttpResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.TypeAdapter;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.stream.JsonReader;
+import com.google.gson.stream.JsonWriter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -21,89 +24,158 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.nio.charset.StandardCharsets;
 import java.rmi.NoSuchObjectException;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import model.Epic;
 import model.Task;
+import model.TaskStatus;
 
 public class HttpTaskServer {
-    private static final int PORT = 8080;
-    static File backedFile = new File("data.csv");
-    public static TaskManager taskManager = Managers.getDefault(backedFile);
+    private static final int PORT = 8083;
+    public static TaskManager taskManager = new InMemoryTaskManager();
 
-    public static void main(String[] args) throws IOException {
-        HttpServer httpServer = HttpServer.create();
+    public HttpTaskServer(TaskManager taskManager) {
+        this.taskManager = taskManager;
+    }
 
+    public static Gson gson = new GsonBuilder()
+            .setPrettyPrinting()
+            .registerTypeAdapter(LocalDateTime.class, new LocalDateTimeAdapter())
+            .registerTypeAdapter(Duration.class, new DurationAdapter())
+            .create();
+
+    public static Gson getGson() {
+        return gson;
+    }
+    public static HttpServer httpServer;
+
+    public void stop() {
+        httpServer.stop(0);
+    }
+
+    public static Task task1 = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+            LocalDateTime.of(2024, 10,2, 12, 30,00),
+            Duration.ofMinutes(45));
+
+    public static Task task2 = new Task(2,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+            LocalDateTime.of(2024, 10,2, 12, 30,00),
+            Duration.ofMinutes(45));
+
+    public static void start() throws IOException{
+        httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler());
-        httpServer.createContext("/subTasks", new SubtasksHandler());
-        httpServer.createContext("/epics", new EpicsHandler());
-        httpServer.createContext("/history", new HistoryHandler());
-        httpServer.createContext("/prioritized", new PrioritizedHandler());
+        //httpServer.createContext(/subTasks", new SubtasksHandler());
+        //httpServer.createContext("/epics", new EpicsHandler());
+        //httpServer.createContext("/history", new HistoryHandler());
+        // httpServer.createContext("/prioritized", new PrioritizedHandler());
         httpServer.start();
     }
-
-    class TasksArrayTypeToken extends TypeToken<List<Task>> {
+    public static void main(String[] args) throws IOException {
+        start();
     }
 
-    enum Endpoint {GET_TASKS, GET_TASK_BY_ID, POST_TASK, POST_TASK_BY_ID, GET_PRIORITIZED, GET_HISTORY, UNKNOWN}
+
+    static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
+        private static final DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        @Override
+        public void write(final JsonWriter jsonWriter, final LocalDateTime localDateTime) throws IOException {
+            jsonWriter.value(localDateTime.format(dtf));
+        }
+
+        @Override
+        public LocalDateTime read(final JsonReader jsonReader) throws IOException {
+            return LocalDateTime.parse(jsonReader.nextString(), dtf);
+        }
+    }
+
+    static class DurationAdapter extends TypeAdapter<Duration> {
+        @Override
+        public void write(final JsonWriter jsonWriter, final Duration duration) throws IOException {
+            jsonWriter.value(duration.toMinutes());
+        }
+
+        @Override
+        public Duration read(final JsonReader jsonReader) throws IOException {
+            return Duration.parse(jsonReader.nextString());
+        }
+    }
+
+    enum Endpoint {GET, GET_BY_ID, POST, POST_BY_ID, GET_PRIORITIZED, GET_HISTORY, DELETE, UNKNOWN}
 
     public static Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] splitStrings = requestPath.split("/");
         if (requestMethod.equals("GET") && splitStrings.length < 3) {
-            return Endpoint.GET_TASKS;
+            return Endpoint.GET;
         } else if (requestMethod.equals("GET") && splitStrings.length == 3) {
-            return Endpoint.GET_TASK_BY_ID;
+            return Endpoint.GET_BY_ID;
         } else if (requestMethod.equals("POST") && splitStrings.length < 3) {
-            return Endpoint.POST_TASK;
+            return Endpoint.POST;
         } else if (requestMethod.equals("POST") && splitStrings.length == 3) {
-            return Endpoint.POST_TASK_BY_ID;
+            return Endpoint.POST_BY_ID;
         } else if (requestMethod.equals("GET") && splitStrings[1].equals("history")) {
             return Endpoint.GET_HISTORY;
         } else if (requestMethod.equals("GET") && splitStrings[1].equals("prioritized")) {
             return Endpoint.GET_PRIORITIZED;
-        } else {
+        }else if (requestMethod.equals("DELETE") && splitStrings.length == 3) {
+            return Endpoint.DELETE;
+        }else {
             return Endpoint.UNKNOWN;
         }
     }
 
-
     static class TasksHandler extends BaseHttpHandler implements HttpHandler {
-        Gson gson = new GsonBuilder()
-                .setPrettyPrinting()
-                .create();
 
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
             try {
-                InputStream inputStream = httpExchange.getRequestBody();
+                InputStream requestBody = httpExchange.getRequestBody();
                 String requestMethod = httpExchange.getRequestMethod();
                 String requestPath = httpExchange.getRequestURI().getPath();
                 String[] splitStrings = requestPath.split("/");
                 Endpoint endpoint = getEndpoint(requestPath, requestMethod);
-
+                taskManager.addTask(task1);
+                taskManager.addTask(task2);
                 switch (endpoint) {
-                    case GET_TASKS:
+                    case GET:
                         ArrayList<Task> tasks = taskManager.getTasks();
                         String jsonTasks = gson.toJson(tasks);
                         sendText(httpExchange, jsonTasks);
                         break;
-                    case GET_TASK_BY_ID:
-                        int id = Integer.parseInt(splitStrings[3]);
+                    case GET_BY_ID:
+                        int id = Integer.parseInt(splitStrings[2]);
                         Task task = taskManager.getTaskById(id);
                         String jsonTask = gson.toJson(task);
                         sendText(httpExchange, jsonTask);
-                    case POST_TASK:
-                        String taskForPost = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                    case POST:
+                        String taskForPost = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+                        System.out.println("Тело запроса:\n" + taskForPost); //для проверки
+
                         Task newTask = gson.fromJson(taskForPost, Task.class);
-                        taskManager.addTask(newTask);
-                        httpExchange.sendResponseHeaders(201, 0);
-                        httpExchange.close();
-                    case POST_TASK_BY_ID:
-                        String taskForPostWithId = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+                        System.out.println(newTask);
+                        if (taskManager.checkIntersectionTasks(newTask)) {
+                            sendHasInteractions(httpExchange);
+                        } else {
+                            taskManager.addTask(newTask);
+
+                            String response = "Задача добавлена";
+                            httpExchange.sendResponseHeaders(201, 0);
+
+                            try (OutputStream os = httpExchange.getResponseBody()) {
+                                os.write(response.getBytes());
+                            }
+                        }
+                    case POST_BY_ID:
+                        String taskForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
                         Task newTaskWithId = gson.fromJson(taskForPostWithId, Task.class);
                         if (taskManager.checkIntersectionTasks(newTaskWithId)) {
                             sendHasInteractions(httpExchange);
@@ -112,37 +184,80 @@ public class HttpTaskServer {
                             httpExchange.sendResponseHeaders(201, 0);
                             httpExchange.close();
                         }
+                    case DELETE:
+                        int idForDelete = Integer.parseInt(splitStrings[2]);
+                        taskManager.removeTaskById(idForDelete);
+                        httpExchange.sendResponseHeaders(201, 0);
+                        httpExchange.close();
                 }
             } catch (NoSuchObjectException e) {
                 sendNotFound(httpExchange);
+            } catch (InternalError e) {
+                sendInternalError(httpExchange);
             }
         }
     }
 
-    static class EpicsHandler extends BaseHttpHandler implements HttpHandler {
-        @Override
+    /*static class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         public void handle(HttpExchange httpExchange) throws IOException {
+            try {
+                InputStream requestBody = httpExchange.getRequestBody();
+                String requestMethod = httpExchange.getRequestMethod();
+                String requestPath = httpExchange.getRequestURI().getPath();
+                String[] splitStrings = requestPath.split("/");
+                Endpoint endpoint = getEndpoint(requestPath, requestMethod);
 
-           /* Headers headers = httpExchange.getResponseHeaders();
-            headers.set("Content-Type", "text/plain; charset=utf-8");*/
+                switch (endpoint) {
+                    case GET:
+                        ArrayList<Epic> epics = taskManager.getEpics();
+                        String jsonEpics = gson.toJson(epics);
+                        sendText(httpExchange, jsonEpics);
+                        break;
+                    case GET_BY_ID:
+                        int id = Integer.parseInt(splitStrings[3]);
+                        Epic epic = taskManager.getEpicById(id);
+                        String jsonEpic = gson.toJson(epic);
+                        sendText(httpExchange, jsonEpic);
+                    case POST:
+                        String epicForPost = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+                        Epic newEpic = gson.fromJson(epicForPost, Epic.class);
+                        if (taskManager.checkIntersectionTasks(newEpic)) {
+                            sendHasInteractions(httpExchange);
+                        } else {
+                            taskManager.addTask(newEpic);
+                            httpExchange.sendResponseHeaders(201, 0);
+                            httpExchange.close();
+                        }
+                    case POST_BY_ID:
+                        String epicForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
+                        Epic newEpicWithId = gson.fromJson(epicForPostWithId, Epic.class);
+                        if (taskManager.checkIntersectionTasks(newEpicWithId)) {
+                            sendHasInteractions(httpExchange);
+                        } else {
+                            taskManager.updateEpic(newEpicWithId);
+                            httpExchange.sendResponseHeaders(201, 0);
+                            httpExchange.close();
+                        }
+                }
+            } catch (NoSuchObjectException e) {
+                sendNotFound(httpExchange);
+            } catch (InternalError e) {
+                sendInternalError(httpExchange);
+            }
         }
-    }
+    }*/
 
-    static class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
+    /*static class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
 
-           /* Headers headers = httpExchange.getResponseHeaders();
-            headers.set("Content-Type", "text/plain; charset=utf-8");*/
+
         }
     }
 
     static class HistoryHandler extends BaseHttpHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
-
-           /* Headers headers = httpExchange.getResponseHeaders();
-            headers.set("Content-Type", "text/plain; charset=utf-8");*/
 
         }
     }
@@ -151,8 +266,7 @@ public class HttpTaskServer {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
 
-           /* Headers headers = httpExchange.getResponseHeaders();
-            headers.set("Content-Type", "text/plain; charset=utf-8");*/
+
         }
-    }
+    }*/
 }

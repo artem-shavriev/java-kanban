@@ -67,6 +67,16 @@ public class Task {
 
     }
 
+    public Task(String nameOfTask, String description, int id, TaskStatus taskStatus,
+                Duration duration, LocalDateTime startTime) {
+        this.id = id;
+        this.nameOfTask = nameOfTask;
+        this.taskStatus = taskStatus;
+        this.description = description;
+        this.startTime = startTime;
+        this.duration = duration;
+    }
+
     public TaskType getTaskType() {
         return taskType.TASK;
     }
@@ -139,11 +149,13 @@ public class Task {
 
     @Override
     public String toString() {
-        return "model.Task{" +
+        return "Task{" +
                 "nameOfTask='" + nameOfTask + '\'' +
                 ", description='" + description + '\'' +
                 ", id=" + id +
                 ", taskStatus=" + taskStatus +
+                ", duration=" + duration +
+                ", startTime=" + startTime +
                 '}';
     }
 }
