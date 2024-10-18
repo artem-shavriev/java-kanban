@@ -39,7 +39,7 @@ import model.Task;
 import model.TaskStatus;
 
 public class HttpTaskServer {
-    private static final int PORT = 8083;
+    private static final int PORT = 8080;
     public static TaskManager taskManager = new InMemoryTaskManager();
 
     public HttpTaskServer(TaskManager taskManager) {
@@ -61,11 +61,11 @@ public class HttpTaskServer {
         httpServer.stop(0);
     }
 
-    public static Task task1 = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
-            LocalDateTime.of(2024, 10,2, 12, 30,00),
+    public static Task task1 = new Task(1,"Тест1", TaskStatus.NEW, "Тест1",
+            LocalDateTime.of(2024, 10,3, 12, 30,00),
             Duration.ofMinutes(45));
 
-    public static Task task2 = new Task(2,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+    public static Task task2 = new Task(2,"Тест2", TaskStatus.NEW, "Тест2",
             LocalDateTime.of(2024, 10,2, 12, 30,00),
             Duration.ofMinutes(45));
 
@@ -106,7 +106,7 @@ public class HttpTaskServer {
 
         @Override
         public Duration read(final JsonReader jsonReader) throws IOException {
-            return Duration.parse(jsonReader.nextString());
+            return Duration.ofMinutes(Long.parseLong(jsonReader.nextString()));
         }
     }
 
@@ -143,8 +143,11 @@ public class HttpTaskServer {
                 String requestPath = httpExchange.getRequestURI().getPath();
                 String[] splitStrings = requestPath.split("/");
                 Endpoint endpoint = getEndpoint(requestPath, requestMethod);
+                Task task1 = new Task(1,"Уборка", TaskStatus.NEW, "Собрать и вынести мусор",
+                        LocalDateTime.of(2024, 10,2, 12, 30,00),
+                        Duration.ofMinutes(45));
                 taskManager.addTask(task1);
-                taskManager.addTask(task2);
+
                 switch (endpoint) {
                     case GET:
                         ArrayList<Task> tasks = taskManager.getTasks();
@@ -156,12 +159,11 @@ public class HttpTaskServer {
                         Task task = taskManager.getTaskById(id);
                         String jsonTask = gson.toJson(task);
                         sendText(httpExchange, jsonTask);
+                        break;
                     case POST:
                         String taskForPost = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-                        System.out.println("Тело запроса:\n" + taskForPost); //для проверки
-
                         Task newTask = gson.fromJson(taskForPost, Task.class);
-                        System.out.println(newTask);
+
                         if (taskManager.checkIntersectionTasks(newTask)) {
                             sendHasInteractions(httpExchange);
                         } else {
@@ -174,21 +176,28 @@ public class HttpTaskServer {
                                 os.write(response.getBytes());
                             }
                         }
-                    case POST_BY_ID:
+                        break;
+                    case POST_BY_ID: //задача пересекается сама с собой по времени при обновлении
                         String taskForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
                         Task newTaskWithId = gson.fromJson(taskForPostWithId, Task.class);
                         if (taskManager.checkIntersectionTasks(newTaskWithId)) {
                             sendHasInteractions(httpExchange);
                         } else {
                             taskManager.updateTask(newTaskWithId);
+                            String response = "Задача добавлена";
                             httpExchange.sendResponseHeaders(201, 0);
-                            httpExchange.close();
+
+                            try (OutputStream os = httpExchange.getResponseBody()) {
+                                os.write(response.getBytes());
+                            }
                         }
+                        break;
                     case DELETE:
                         int idForDelete = Integer.parseInt(splitStrings[2]);
                         taskManager.removeTaskById(idForDelete);
                         httpExchange.sendResponseHeaders(201, 0);
                         httpExchange.close();
+                        break;
                 }
             } catch (NoSuchObjectException e) {
                 sendNotFound(httpExchange);
