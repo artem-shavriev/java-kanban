@@ -67,10 +67,10 @@ public class HttpTaskServer {
         httpServer = HttpServer.create();
         httpServer.bind(new InetSocketAddress(PORT), 0);
         httpServer.createContext("/tasks", new TasksHandler());
-        //httpServer.createContext("/epics", new EpicsHandler());
+        httpServer.createContext("/epics", new EpicsHandler());
         httpServer.createContext("/subtasks", new SubtasksHandler());
         httpServer.createContext("/history", new HistoryHandler());
-        // httpServer.createContext("/prioritized", new PrioritizedHandler());
+        httpServer.createContext("/prioritized", new PrioritizedHandler());
         httpServer.start();
     }
 
@@ -196,8 +196,8 @@ public class HttpTaskServer {
             }
         }
     }
-
-    /*static class EpicsHandler extends BaseHttpHandler implements HttpHandler {
+//Не сереализуется в джисон из за отсутствия даты ????
+    static class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
             try {
@@ -264,7 +264,7 @@ public class HttpTaskServer {
                 sendInternalError(httpExchange);
             }
         }
-    }*/
+    }
 
     static class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
 
@@ -341,10 +341,25 @@ public class HttpTaskServer {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
             try {
-                String requestPath = httpExchange.getRequestURI().getPath();
                 List<Task> historyList = taskManager.getHistory();
                 String jsonHistory = gson.toJson(historyList);
                 sendText(httpExchange, jsonHistory);
+
+            } catch (NoSuchObjectException e) {
+                sendNotFound(httpExchange);
+            } catch (InternalError e) {
+                sendInternalError(httpExchange);
+            }
+        }
+    }
+
+    static class PrioritizedHandler extends BaseHttpHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange httpExchange) throws IOException {
+            try {
+                List<Task> prioritizedTaskList = taskManager.getPrioritizedTask();
+                String jsonPrioritized = gson.toJson(prioritizedTaskList);
+                sendText(httpExchange, jsonPrioritized);
 
             } catch (NoSuchObjectException e) {
                 sendNotFound(httpExchange);
