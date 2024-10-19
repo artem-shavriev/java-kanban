@@ -91,7 +91,9 @@ public class HttpTaskServer {
         }
     }
 
-    enum Endpoint {GET, GET_BY_ID, POST, POST_BY_ID, GET_EPIC_SUBTASKS, GET_PRIORITIZED, GET_HISTORY, DELETE, UNKNOWN}
+    enum Endpoint {
+        GET, GET_BY_ID, POST, POST_BY_ID, GET_EPIC_SUBTASKS, GET_PRIORITIZED, GET_HISTORY, DELETE, UNKNOWN
+    }
 
     public static Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] splitStrings = requestPath.split("/");
@@ -162,12 +164,12 @@ public class HttpTaskServer {
                         break;
                     case POST_BY_ID:
                         String taskForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-                        Task TaskForUpdateWithId = gson.fromJson(taskForPostWithId, Task.class);
-                        if (taskManager.getTasks().contains(TaskForUpdateWithId)) {
-                            if (taskManager.checkIntersectionTasks(TaskForUpdateWithId)) {
+                        Task taskForUpdateWithId = gson.fromJson(taskForPostWithId, Task.class);
+                        if (taskManager.getTasks().contains(taskForUpdateWithId)) {
+                            if (taskManager.checkIntersectionTasks(taskForUpdateWithId)) {
                                 sendHasInteractions(httpExchange);
                             } else {
-                                taskManager.updateTask(TaskForUpdateWithId);
+                                taskManager.updateTask(taskForUpdateWithId);
                                 String response = "Задача добавлена";
                                 httpExchange.sendResponseHeaders(201, 0);
 
@@ -259,7 +261,7 @@ public class HttpTaskServer {
                             sendNotFound(httpExchange);
                         } else {
                             List subtasksIds = epic.getSubtasksIds();
-                            String jsonSubtasksIds= gson.toJson(subtasksIds);
+                            String jsonSubtasksIds = gson.toJson(subtasksIds);
                             sendText(httpExchange, jsonSubtasksIds);
                         }
                         break;
