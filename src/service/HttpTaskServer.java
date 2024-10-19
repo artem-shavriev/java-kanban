@@ -104,7 +104,7 @@ public class HttpTaskServer {
         }
     }
 
-    enum Endpoint {GET, GET_BY_ID, POST, POST_BY_ID, GET_PRIORITIZED, GET_HISTORY, DELETE, UNKNOWN}
+    enum Endpoint {GET, GET_BY_ID, POST, POST_BY_ID, GET_EPIC_SUBTASKS, GET_PRIORITIZED, GET_HISTORY, DELETE, UNKNOWN}
 
     public static Endpoint getEndpoint(String requestPath, String requestMethod) {
         String[] splitStrings = requestPath.split("/");
@@ -122,6 +122,8 @@ public class HttpTaskServer {
             return Endpoint.GET_PRIORITIZED;
         } else if (requestMethod.equals("DELETE") && splitStrings.length == 3) {
             return Endpoint.DELETE;
+        } else if (requestMethod.equals("GET") && splitStrings[3].equals("subtasks")) {
+            return Endpoint.GET_EPIC_SUBTASKS;
         } else {
             return Endpoint.UNKNOWN;
         }
@@ -147,8 +149,12 @@ public class HttpTaskServer {
                     case GET_BY_ID:
                         int id = Integer.parseInt(splitStrings[2]);
                         Task task = taskManager.getTaskById(id);
-                        String jsonTask = gson.toJson(task);
-                        sendText(httpExchange, jsonTask);
+                        if (task == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            String jsonTask = gson.toJson(task);
+                            sendText(httpExchange, jsonTask);
+                        }
                         break;
                     case POST:
                         String taskForPost = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
@@ -169,24 +175,32 @@ public class HttpTaskServer {
                         break;
                     case POST_BY_ID:
                         String taskForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-                        Task newTaskWithId = gson.fromJson(taskForPostWithId, Task.class);
-                        if (taskManager.checkIntersectionTasks(newTaskWithId)) {
-                            sendHasInteractions(httpExchange);
-                        } else {
-                            taskManager.updateTask(newTaskWithId);
-                            String response = "Задача добавлена";
-                            httpExchange.sendResponseHeaders(201, 0);
+                        Task TaskForUpdateWithId = gson.fromJson(taskForPostWithId, Task.class);
+                        if (taskManager.getTasks().contains(TaskForUpdateWithId)) {
+                            if (taskManager.checkIntersectionTasks(TaskForUpdateWithId)) {
+                                sendHasInteractions(httpExchange);
+                            } else {
+                                taskManager.updateTask(TaskForUpdateWithId);
+                                String response = "Задача добавлена";
+                                httpExchange.sendResponseHeaders(201, 0);
 
-                            try (OutputStream os = httpExchange.getResponseBody()) {
-                                os.write(response.getBytes());
+                                try (OutputStream os = httpExchange.getResponseBody()) {
+                                    os.write(response.getBytes());
+                                }
                             }
+                        } else {
+                            sendNotFound(httpExchange);
                         }
                         break;
                     case DELETE:
                         int idForDelete = Integer.parseInt(splitStrings[2]);
-                        taskManager.removeTaskById(idForDelete);
-                        httpExchange.sendResponseHeaders(200, 0);
-                        httpExchange.close();
+                        if (taskManager.getTaskById(idForDelete) == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            taskManager.removeTaskById(idForDelete);
+                            httpExchange.sendResponseHeaders(200, 0);
+                            httpExchange.close();
+                        }
                         break;
                 }
             } catch (NoSuchObjectException e) {
@@ -196,7 +210,7 @@ public class HttpTaskServer {
             }
         }
     }
-//Не сереализуется в джисон из за отсутствия даты ????
+
     static class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         @Override
         public void handle(HttpExchange httpExchange) throws IOException {
@@ -206,8 +220,7 @@ public class HttpTaskServer {
                 String requestPath = httpExchange.getRequestURI().getPath();
                 String[] splitStrings = requestPath.split("/");
                 Endpoint endpoint = getEndpoint(requestPath, requestMethod);
-                Epic epic1 = new Epic(1,"Эпик 1", "Организовать путешествие");
-                taskManager.addEpic(epic1);
+
                 switch (endpoint) {
                     case GET:
                         ArrayList<Epic> epics = taskManager.getEpics();
@@ -216,46 +229,62 @@ public class HttpTaskServer {
                         break;
                     case GET_BY_ID:
                         int id = Integer.parseInt(splitStrings[2]);
-                        Epic epic = taskManager.getEpicById(id);
-                        String jsonEpic = gson.toJson(epic);
-                        sendText(httpExchange, jsonEpic);
+                        if (taskManager.getEpicById(id) == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            Epic epic = taskManager.getEpicById(id);
+                            String jsonEpic = gson.toJson(epic);
+                            sendText(httpExchange, jsonEpic);
+                        }
                         break;
                     case POST:
                         String epicForPost = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
                         Epic newEpic = gson.fromJson(epicForPost, Epic.class);
 
-                        if (taskManager.checkIntersectionTasks(newEpic)) {
-                            sendHasInteractions(httpExchange);
-                        } else {
-                            taskManager.addEpic(newEpic);
-                            String response = "Эпик добавлен";
-                            httpExchange.sendResponseHeaders(201, 0);
+                        taskManager.addEpic(newEpic);
+                        String response = "Эпик добавлен";
+                        httpExchange.sendResponseHeaders(201, 0);
 
-                            try (OutputStream os = httpExchange.getResponseBody()) {
-                                os.write(response.getBytes());
-                            }
+                        try (OutputStream os = httpExchange.getResponseBody()) {
+                            os.write(response.getBytes());
                         }
                         break;
                     case POST_BY_ID:
                         String epicForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-                        Epic newEpicWithId = gson.fromJson(epicForPostWithId, Epic.class);
-                        if (taskManager.checkIntersectionTasks(newEpicWithId)) {
-                            sendHasInteractions(httpExchange);
-                        } else {
-                            taskManager.updateTask(newEpicWithId);
-                            String response = "Эпик добавлен";
+                        Epic updateEpicWithId = gson.fromJson(epicForPostWithId, Epic.class);
+                        if (taskManager.getEpics().contains(updateEpicWithId)) {
+                            taskManager.updateEpic(updateEpicWithId);
+                            response = "Эпик обновлен";
                             httpExchange.sendResponseHeaders(201, 0);
 
                             try (OutputStream os = httpExchange.getResponseBody()) {
                                 os.write(response.getBytes());
+
                             }
+                        } else {
+                            sendNotFound(httpExchange);
+                        }
+                        break;
+                    case GET_EPIC_SUBTASKS:
+                        id = Integer.parseInt(splitStrings[2]);
+                        Epic epic = taskManager.getEpicById(id);
+                        if (epic == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            List subtasksIds = epic.getSubtasksIds();
+                            String jsonSubtasksIds= gson.toJson(subtasksIds);
+                            sendText(httpExchange, jsonSubtasksIds);
                         }
                         break;
                     case DELETE:
                         int idForDelete = Integer.parseInt(splitStrings[2]);
-                        taskManager.removeEpicById(idForDelete);
-                        httpExchange.sendResponseHeaders(200, 0);
-                        httpExchange.close();
+                        if (taskManager.getEpicById(idForDelete) == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            taskManager.removeEpicById(idForDelete);
+                            httpExchange.sendResponseHeaders(200, 0);
+                            httpExchange.close();
+                        }
                         break;
                 }
             } catch (NoSuchObjectException e) {
@@ -285,10 +314,14 @@ public class HttpTaskServer {
                         break;
                     case GET_BY_ID:
                         int id = Integer.parseInt(splitStrings[2]);
-                        Subtask subtask = taskManager.getSubtaskById(id);
-                        String jsonTask = gson.toJson(subtask);
-                        sendText(httpExchange, jsonTask);
-                        break;
+                        if (taskManager.getSubtaskById(id) == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            Subtask subtask = taskManager.getSubtaskById(id);
+                            String jsonTask = gson.toJson(subtask);
+                            sendText(httpExchange, jsonTask);
+                            break;
+                        }
                     case POST:
                         String taskForPost = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
                         Subtask newTask = gson.fromJson(taskForPost, Subtask.class);
@@ -308,24 +341,32 @@ public class HttpTaskServer {
                         break;
                     case POST_BY_ID:
                         String taskForPostWithId = new String(requestBody.readAllBytes(), StandardCharsets.UTF_8);
-                        Subtask newTaskWithId = gson.fromJson(taskForPostWithId, Subtask.class);
-                        if (taskManager.checkIntersectionTasks(newTaskWithId)) {
-                            sendHasInteractions(httpExchange);
-                        } else {
-                            taskManager.updateSubtask(newTaskWithId);
-                            String response = "Подзадача обновлена";
-                            httpExchange.sendResponseHeaders(201, 0);
+                        Subtask updateTaskWithId = gson.fromJson(taskForPostWithId, Subtask.class);
+                        if (taskManager.getSubtasks().contains(updateTaskWithId)) {
+                            if (taskManager.checkIntersectionTasks(updateTaskWithId)) {
+                                sendHasInteractions(httpExchange);
+                            } else {
+                                taskManager.updateSubtask(updateTaskWithId);
+                                String response = "Подзадача обновлена";
+                                httpExchange.sendResponseHeaders(201, 0);
 
-                            try (OutputStream os = httpExchange.getResponseBody()) {
-                                os.write(response.getBytes());
+                                try (OutputStream os = httpExchange.getResponseBody()) {
+                                    os.write(response.getBytes());
+                                }
                             }
+                        } else {
+                            sendNotFound(httpExchange);
                         }
                         break;
                     case DELETE:
                         int idForDelete = Integer.parseInt(splitStrings[2]);
-                        taskManager.removeSubtaskById(idForDelete);
-                        httpExchange.sendResponseHeaders(200, 0);
-                        httpExchange.close();
+                        if (taskManager.getSubtaskById(idForDelete) == null) {
+                            sendNotFound(httpExchange);
+                        } else {
+                            taskManager.removeSubtaskById(idForDelete);
+                            httpExchange.sendResponseHeaders(200, 0);
+                            httpExchange.close();
+                        }
                         break;
                 }
             } catch (NoSuchObjectException e) {
@@ -344,7 +385,6 @@ public class HttpTaskServer {
                 List<Task> historyList = taskManager.getHistory();
                 String jsonHistory = gson.toJson(historyList);
                 sendText(httpExchange, jsonHistory);
-
             } catch (NoSuchObjectException e) {
                 sendNotFound(httpExchange);
             } catch (InternalError e) {
@@ -360,7 +400,6 @@ public class HttpTaskServer {
                 List<Task> prioritizedTaskList = taskManager.getPrioritizedTask();
                 String jsonPrioritized = gson.toJson(prioritizedTaskList);
                 sendText(httpExchange, jsonPrioritized);
-
             } catch (NoSuchObjectException e) {
                 sendNotFound(httpExchange);
             } catch (InternalError e) {
