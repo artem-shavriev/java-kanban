@@ -1,10 +1,6 @@
 package service;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 import model.Task;
 import model.TaskStatus;
@@ -13,7 +9,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 
 import java.io.IOException;
-import java.lang.reflect.Type;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
@@ -136,7 +131,6 @@ public class HttpTaskManagerTasksTest {
 
         assertEquals(200, response.statusCode());
 
-       // assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
         assertEquals("Тест1",  tasks.get(0).getNameOfTask(), "Некорректное имя задачи");
         assertEquals("Тест2",  tasks.get(1).getNameOfTask(), "Некорректное имя задачи");
     }

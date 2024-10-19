@@ -15,12 +15,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 public class HttpTaskManagerHistoryTest {
     TaskManager manager = new InMemoryTaskManager();
@@ -81,7 +78,6 @@ public class HttpTaskManagerHistoryTest {
 
         assertEquals(200, response.statusCode());
 
-       // assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
         assertEquals("задача 1", responseHistory.get(0).getNameOfTask(), "Некорректное имя задачи");
         assertEquals("задача 2", responseHistory.get(1).getNameOfTask(), "Некорректное имя задачи");
         assertEquals("задача 3", responseHistory.get(2).getNameOfTask(), "Некорректное имя задачи");

@@ -4,7 +4,6 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import model.Epic;
 import model.Subtask;
-import model.Task;
 import model.TaskStatus;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -143,8 +142,6 @@ public class HttpTaskManagerSubtasksTest {
         ArrayList<Subtask> subtasks = gson.fromJson(response.body(), new SubtaskListTypeToken().getType());
 
         assertEquals(200, response.statusCode());
-
-       // assertEquals(1, tasksFromManager.size(), "Некорректное количество задач");
         assertEquals("подзадача 1", subtasks.get(0).getNameOfTask(), "Некорректное имя задачи");
         assertEquals("подзадача 2", subtasks.get(1).getNameOfTask(), "Некорректное имя задачи");
     }
