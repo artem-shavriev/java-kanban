@@ -17,7 +17,11 @@ import static service.HttpTaskServer.getEndpoint;
 import static service.HttpTaskServer.gson;
 
 public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
-    TaskManager manager = HttpTaskServer.getTaskManager();
+    private TaskManager manager;
+
+    public EpicsHandler(TaskManager manager) {
+        this.manager = manager;
+    }
 
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {

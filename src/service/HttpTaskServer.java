@@ -17,18 +17,20 @@ import java.time.format.DateTimeFormatter;
 import model.Endpoint;
 
 public class HttpTaskServer {
-    private static final int PORT = 8080;
-    private static TaskManager taskManager;
-    //Не понимаю как сделать taskManager не статическим. Когда он не статический
-    //не получается получить именно его в классах хендлерах.
-    private static HttpServer httpServer;
+    public static final int PORT = 8080;
 
-    public HttpTaskServer(TaskManager taskManager) {
-        this.taskManager = taskManager;
-    }
+    private final TaskManager manager;
+    private final HttpServer server;
 
-    public static TaskManager getTaskManager() {
-        return taskManager;
+    public HttpTaskServer(TaskManager manager) throws IOException {
+        this.manager = manager;
+
+        server = HttpServer.create(new InetSocketAddress("localhost", PORT), 0);
+        server.createContext("/tasks", new TasksHandler(manager));
+        server.createContext("/subtasks", new SubtasksHandler(manager));
+        server.createContext("/epics", new EpicsHandler(manager));
+        server.createContext("/history", new HistoryHandler(manager));
+        server.createContext("/prioritized", new PrioritizedHandler(manager));
     }
 
     public static Gson gson = new GsonBuilder()
@@ -41,24 +43,14 @@ public class HttpTaskServer {
         return gson;
     }
 
-    public static void stop() {
-        httpServer.stop(0);
+    public void start() {
+        System.out.println("Starting TaskServer " + PORT);
+        server.start();
     }
 
-    public static void start() throws IOException {
-        httpServer = HttpServer.create();
-
-        httpServer.bind(new InetSocketAddress(PORT), 0);
-        httpServer.createContext("/tasks", new TasksHandler());
-        httpServer.createContext("/epics",  new EpicsHandler());
-        httpServer.createContext("/subtasks", new SubtasksHandler());
-        httpServer.createContext("/history",new HistoryHandler());
-        httpServer.createContext("/prioritized", new PrioritizedHandler());
-        httpServer.start();
-    }
-
-    public static void main(String[] args) throws IOException {
-        start();
+    public void stop() {
+        server.stop(0);
+        System.out.println("Остановили сервер на порту " + PORT);
     }
 
     static class LocalDateTimeAdapter extends TypeAdapter<LocalDateTime> {
