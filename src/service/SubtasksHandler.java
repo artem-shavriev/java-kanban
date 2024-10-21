@@ -21,6 +21,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     public SubtasksHandler(TaskManager manager) {
         this.manager = manager;
     }
+
     @Override
     public void handle(HttpExchange httpExchange) throws IOException {
         try {
