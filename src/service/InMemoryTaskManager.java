@@ -64,6 +64,9 @@ public class InMemoryTaskManager implements TaskManager {
             id = epic.getId();
         }
         epics.put(id, epic);
+        epic.setStartTime(LocalDateTime.now());
+        epic.setDuration(Duration.ofMinutes(0));
+        epic.setEndTime(LocalDateTime.now());
         updateEpicStatus(epic);
         return epic;
     }
@@ -257,10 +260,10 @@ public class InMemoryTaskManager implements TaskManager {
             Epic epic = epics.get(id);
             ArrayList<Integer> idsForRemove = epic.getSubtasksIds();
             idsForRemove.forEach(removeId -> {
-                        subtasks.remove(id);
-                        sortedByTimeTasks.remove(subtasks.get(id));
-                        historyManager.remove(id);
-                    });
+                subtasks.remove(id);
+                sortedByTimeTasks.remove(subtasks.get(id));
+                historyManager.remove(id);
+            });
             epics.remove(id);
             historyManager.remove(id);
         }
@@ -269,9 +272,9 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeTasks() {
         tasks.keySet().forEach(id -> {
-                    historyManager.remove(id);
-                    sortedByTimeTasks.remove(tasks.get(id));
-                });
+            historyManager.remove(id);
+            sortedByTimeTasks.remove(tasks.get(id));
+        });
         tasks.clear();
     }
 
@@ -279,9 +282,9 @@ public class InMemoryTaskManager implements TaskManager {
     public void removeEpics() {
         epics.keySet().forEach(id -> historyManager.remove(id));
         subtasks.keySet().forEach(id -> {
-                    historyManager.remove(id);
-                    sortedByTimeTasks.remove(subtasks.get(id));
-                });
+            historyManager.remove(id);
+            sortedByTimeTasks.remove(subtasks.get(id));
+        });
         epics.clear();
         subtasks.clear();
     }
@@ -289,16 +292,16 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void removeSubtasks() {
         subtasks.keySet().forEach(id -> {
-                    historyManager.remove(id);
-                    sortedByTimeTasks.remove(subtasks.get(id));
-                });
+            historyManager.remove(id);
+            sortedByTimeTasks.remove(subtasks.get(id));
+        });
         subtasks.clear();
 
         epics.values().forEach(epic -> {
-                    epic.setTaskStatus(TaskStatus.NEW);
-                    epic.removeAllSubtasksIds();
-                    updateEpicTime(epic);
-                });
+            epic.setTaskStatus(TaskStatus.NEW);
+            epic.removeAllSubtasksIds();
+            updateEpicTime(epic);
+        });
     }
 
     @Override
@@ -379,7 +382,7 @@ public class InMemoryTaskManager implements TaskManager {
                         epicEndTime = subtasksOfEpic.get(i).getEndTime();
                     }
                 }
-                epic.setEpicEndTime(epicEndTime);
+                epic.setEndTime(epicEndTime);
             }
         }
     }
@@ -403,18 +406,22 @@ public class InMemoryTaskManager implements TaskManager {
     public boolean checkIntersectionTasks(Task task) {
         boolean iskIntersection = false;
         for (Task t : getPrioritizedTask()) {
-            if (task.getStartTime().isAfter(t.getStartTime())
-                    && task.getEndTime().isBefore(t.getEndTime())) {
-                iskIntersection = true;
-            } else if (task.getStartTime().isBefore(t.getStartTime())
-                    && task.getEndTime().isAfter(t.getStartTime())) {
-                iskIntersection = true;
-            } else if (task.getStartTime().isAfter(t.getStartTime())
-                    && task.getStartTime().isBefore(t.getEndTime())) {
-                iskIntersection = true;
-            } else if (task.getStartTime().isBefore(t.getStartTime())
-                    && task.getEndTime().isAfter(t.getEndTime())) {
-                iskIntersection = true;
+            if (t.getId() != task.getId()) {
+                if (task.getStartTime().isEqual(t.getStartTime())) {
+                    iskIntersection = true;
+                } else if (task.getStartTime().isAfter(t.getStartTime())
+                        && task.getEndTime().isBefore(t.getEndTime())) {
+                    iskIntersection = true;
+                } else if (task.getStartTime().isBefore(t.getStartTime())
+                        && task.getEndTime().isAfter(t.getStartTime())) {
+                    iskIntersection = true;
+                } else if (task.getStartTime().isAfter(t.getStartTime())
+                        && task.getStartTime().isBefore(t.getEndTime())) {
+                    iskIntersection = true;
+                } else if (task.getStartTime().isBefore(t.getStartTime())
+                        && task.getEndTime().isAfter(t.getEndTime())) {
+                    iskIntersection = true;
+                }
             }
         }
         return iskIntersection;
