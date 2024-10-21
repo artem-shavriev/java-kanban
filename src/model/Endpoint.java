@@ -1,0 +1,5 @@
+package model;
+
+public enum Endpoint {
+    GET, GET_BY_ID, POST, POST_BY_ID, GET_EPIC_SUBTASKS, GET_PRIORITIZED, GET_HISTORY, DELETE, UNKNOWN
+}

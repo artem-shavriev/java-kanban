@@ -37,4 +37,12 @@ public class BaseHttpHandler {
         exchange.getResponseBody().write(resp);
         exchange.close();
     }
+
+    protected void sendException(HttpExchange exchange, Exception e) throws IOException {
+        String text = e.getMessage();
+        byte[] resp = text.getBytes(StandardCharsets.UTF_8);
+        exchange.sendResponseHeaders(500, 0);
+        exchange.getResponseBody().write(resp);
+        exchange.close();
+    }
 }
