@@ -46,7 +46,7 @@ public class Epic extends Task {
         }
     }
 
-    public void setEpicEndTime(LocalDateTime endTime) {
+    public void setEndTime(LocalDateTime endTime) {
         this.endTime = endTime;
     }
 
@@ -54,4 +54,6 @@ public class Epic extends Task {
     public LocalDateTime getEndTime() {
         return endTime;
     }
+
 }
+

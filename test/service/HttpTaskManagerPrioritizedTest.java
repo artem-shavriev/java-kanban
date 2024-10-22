@@ -1,0 +1,80 @@
+package service;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import model.Task;
+import model.TaskStatus;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+
+import java.io.IOException;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+public class HttpTaskManagerPrioritizedTest {
+    TaskManager manager = new InMemoryTaskManager();
+    HttpTaskServer taskServer = new HttpTaskServer(manager);
+    Gson gson = HttpTaskServer.getGson();
+
+    public HttpTaskManagerPrioritizedTest() throws IOException {
+    }
+
+    @BeforeEach
+    public void setUp() throws IOException {
+        manager.removeTasks();
+        manager.removeSubtasks();
+        manager.removeEpics();
+        taskServer.start();
+    }
+
+    @AfterEach
+    public void shutDown() {
+        taskServer.stop();
+    }
+
+    @Test
+    public void shouldGetHistory() throws IOException, InterruptedException {
+        Task task1 = new Task(1,"задача 1", TaskStatus.NEW, "Собрать и вынести мусор",
+                LocalDateTime.of(2024, 10,2, 12, 30,00),
+                Duration.ofMinutes(45));
+        Task task2 = new Task(2,"задача 2",  TaskStatus.NEW, "Приготовить еду",
+                LocalDateTime.of(2024, 10,2, 13, 30,00),
+                Duration.ofMinutes(45));
+        Task task3 = new Task(3,"задача 3", TaskStatus.NEW, "Постирать вещи",
+                LocalDateTime.of(2024, 10,2, 14, 30,00),
+                Duration.ofMinutes(45));
+        manager.addTask(task1);
+        manager.addTask(task2);
+        manager.addTask(task3);
+
+        manager.getTaskById(1);
+        manager.getTaskById(2);
+        manager.getTaskById(3);
+
+        HttpClient client = HttpClient.newHttpClient();
+        URI url = URI.create("http://localhost:8080/prioritized");
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(url)
+                .GET()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
+
+        class PrioritizedListTypeToken extends TypeToken<List<Task>> {
+        }
+
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+
+        List<Task> responsePrioritized = gson.fromJson(response.body(), new PrioritizedListTypeToken().getType());
+
+        assertEquals(200, response.statusCode());
+        assertEquals(3, responsePrioritized.size(), "История не получена");
+    }
+}
